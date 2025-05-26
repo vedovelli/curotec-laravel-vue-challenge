@@ -88,19 +88,24 @@ A comprehensive task management system that allows users to perform full CRUD op
 
 **Backend (Laravel):**
 
-- Task model with Eloquent relationships and scopes
-- TaskController with single-action controllers
-- Custom Form Request validation classes
+- Task model as final class with strict typing (`declare(strict_types=1)`)
+- Single-action controllers as final, read-only classes (no property mutations)
+- Actions pattern for business logic with single `handle()` method
+- Custom Form Request validation classes with explicit return types
 - API resource transformers for consistent JSON responses
-- Database migrations with proper indexing
+- Database migrations with proper indexing and PSR-12 compliance
+- Method injection over constructor injection for dependencies
 
 **Frontend (Vue 3):**
 
-- Composition API for all components
-- Reactive data binding with v-model
-- Computed properties for filtered lists
-- Component composition for reusable UI elements
-- TailwindCSS for responsive styling
+- Composition API exclusively with TypeScript for type safety
+- Reactive data binding with v-model and computed properties
+- Descriptive naming with "handle" prefix for event functions (e.g., `handleTaskCreate`)
+- Component composition for reusable UI elements with accessibility features
+- TailwindCSS for all styling (no CSS or `<style>` tags)
+- Early returns for improved code readability
+- Const functions over regular functions (e.g., `const handleClick = () => {}`)
+- Proper ARIA labels and accessibility attributes on interactive elements
 
 **Validation Rules:**
 
@@ -213,10 +218,13 @@ A dynamic dashboard that displays task analytics and statistics using Pinia for 
 
 **Frontend Architecture:**
 
-- Modular component composition
-- Reusable UI components
-- Efficient reactivity with minimal re-renders
+- Modular component composition with TypeScript interfaces
+- Reusable UI components with accessibility features (ARIA labels, tabindex, keyboard navigation)
+- Efficient reactivity with minimal re-renders using computed properties
 - Progressive loading for better performance
+- Const functions with descriptive names (e.g., `handleTaskSubmit`, `handleFilterChange`)
+- Early returns in component logic for improved readability
+- TailwindCSS exclusively for styling (no CSS or `<style>` tags)
 
 #### Pinia Store Structure
 
@@ -241,12 +249,43 @@ interface TaskGetters {
 }
 
 interface TaskActions {
-    fetchTasks(): Promise<void>;
-    createTask(task: CreateTaskData): Promise<void>;
-    updateTask(id: number, task: UpdateTaskData): Promise<void>;
-    deleteTask(id: number): Promise<void>;
-    setFilter(status: FilterStatus): void;
+    handleFetchTasks(): Promise<void>;
+    handleCreateTask(task: CreateTaskData): Promise<void>;
+    handleUpdateTask(id: number, task: UpdateTaskData): Promise<void>;
+    handleDeleteTask(id: number): Promise<void>;
+    handleSetFilter(status: FilterStatus): void;
 }
+
+// Store implementation with const functions
+export const useTaskStore = defineStore('task', () => {
+    const state = reactive<TaskState>({
+        tasks: [],
+        loading: false,
+        error: null,
+        filters: { status: 'all' },
+    });
+
+    const handleFetchTasks = async (): Promise<void> => {
+        // Implementation with early returns
+        if (state.loading) return;
+
+        state.loading = true;
+        try {
+            // API call logic
+        } catch (error) {
+            state.error = 'Failed to fetch tasks';
+            return;
+        } finally {
+            state.loading = false;
+        }
+    };
+
+    return {
+        ...toRefs(state),
+        handleFetchTasks,
+        // other actions...
+    };
+});
 ```
 
 #### Acceptance Criteria
@@ -313,11 +352,14 @@ app/
 
 **Key Patterns:**
 
-- Single Action Controllers
-- Form Request Validation
-- API Resources for JSON transformation
-- Repository pattern for data access
-- Service layer for business logic
+- Single Action Controllers as final, read-only classes
+- Actions pattern with single `handle()` method for business logic
+- Form Request Validation with explicit return types and strict typing
+- API Resources for JSON transformation with type declarations
+- Method injection over constructor injection for dependencies
+- PSR-12 coding standards with `declare(strict_types=1)`
+- Final models to prevent inheritance and ensure data integrity
+- Custom exceptions with proper error handling and logging
 
 ### Frontend Architecture (Vue 3 + Inertia.js)
 
@@ -354,11 +396,14 @@ resources/js/
 
 **Key Patterns:**
 
-- Composition API for all components
-- Pinia for state management
-- TypeScript for type safety
-- Component composition for reusability
-- TailwindCSS for styling
+- Composition API exclusively with TypeScript for type safety
+- Pinia for state management with const functions and descriptive naming
+- Component composition for reusability with accessibility features
+- TailwindCSS exclusively for styling (no CSS or `<style>` tags)
+- Descriptive function naming with "handle" prefix for event handlers
+- Early returns for improved code readability
+- Proper ARIA labels, tabindex, and keyboard navigation support
+- Const functions over regular functions with explicit type definitions
 
 ### Database Schema
 
@@ -378,6 +423,168 @@ CREATE TABLE tasks (
     INDEX idx_due_date (due_date),
     INDEX idx_created_at (created_at)
 );
+```
+
+### Implementation Standards
+
+#### Laravel Implementation Rules
+
+**File Structure & Naming:**
+
+- All PHP files must start with `declare(strict_types=1)`
+- Controllers: Final classes, single-action, read-only (no property mutations)
+- Models: Final classes with explicit type declarations
+- Actions: Final classes with single `handle()` method
+- Use PascalCase for class names, camelCase for methods, snake_case for database columns
+
+**Code Examples:**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Actions\Task\CreateTaskAction;
+use App\Http\Requests\CreateTaskRequest;
+use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+
+final readonly class CreateTaskController
+{
+    public function __invoke(
+        CreateTaskRequest $request,
+        CreateTaskAction $action
+    ): JsonResponse {
+        $task = $action->handle($request->validated());
+
+        return response()->json([
+            'task' => $task,
+            'message' => 'Task created successfully'
+        ]);
+    }
+}
+```
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\Task;
+
+use App\Models\Task;
+
+final readonly class CreateTaskAction
+{
+    public function handle(array $data): Task
+    {
+        return Task::create([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'status' => $data['status'] ?? 'pending',
+            'due_date' => $data['due_date'] ?? null,
+        ]);
+    }
+}
+```
+
+#### Vue Implementation Rules
+
+**Component Structure:**
+
+- Use Composition API exclusively with TypeScript
+- Event handlers must use "handle" prefix (e.g., `handleSubmit`, `handleClick`)
+- Use const functions over regular functions
+- Implement accessibility features on all interactive elements
+- Use TailwindCSS exclusively (no CSS or `<style>` tags)
+
+**Code Examples:**
+
+```vue
+<template>
+    <form @submit.prevent="handleSubmit" class="space-y-4 rounded-lg bg-white p-6 shadow-md">
+        <div>
+            <label for="task-title" class="mb-2 block text-sm font-medium text-gray-700"> Task Title </label>
+            <input
+                id="task-title"
+                v-model="form.title"
+                type="text"
+                required
+                aria-describedby="title-error"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <span v-if="errors.title" id="title-error" class="mt-1 text-sm text-red-600" role="alert">
+                {{ errors.title }}
+            </span>
+        </div>
+
+        <button
+            type="submit"
+            :disabled="isSubmitting"
+            tabindex="0"
+            aria-label="Create new task"
+            class="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+            {{ isSubmitting ? 'Creating...' : 'Create Task' }}
+        </button>
+    </form>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref } from 'vue';
+import { useTaskStore } from '@/stores/taskStore';
+
+interface TaskForm {
+    title: string;
+    description: string;
+    status: 'pending' | 'completed';
+    due_date: string | null;
+}
+
+interface FormErrors {
+    title?: string;
+    description?: string;
+    status?: string;
+    due_date?: string;
+}
+
+const taskStore = useTaskStore();
+const isSubmitting = ref<boolean>(false);
+const errors = ref<FormErrors>({});
+
+const form = reactive<TaskForm>({
+    title: '',
+    description: '',
+    status: 'pending',
+    due_date: null,
+});
+
+const handleSubmit = async (): Promise<void> => {
+    if (isSubmitting.value) return;
+
+    isSubmitting.value = true;
+    errors.value = {};
+
+    try {
+        await taskStore.handleCreateTask(form);
+        // Reset form on success
+        Object.assign(form, {
+            title: '',
+            description: '',
+            status: 'pending',
+            due_date: null,
+        });
+    } catch (error) {
+        errors.value = error.response?.data?.errors || { title: 'An error occurred' };
+        return;
+    } finally {
+        isSubmitting.value = false;
+    }
+};
+</script>
 ```
 
 ---
@@ -411,15 +618,23 @@ CREATE TABLE tasks (
 
 ### Component Library
 
-**Reusable Components:**
+**Reusable Components with Accessibility:**
 
-- Button (Primary, Secondary, Danger variants)
-- Form Field (Input, Textarea, Select)
-- Modal (Confirmation, Form modals)
-- Card (Content containers)
-- Badge (Status indicators)
-- Loading Spinner
-- Toast Notifications
+- Button (Primary, Secondary, Danger variants with ARIA labels and keyboard navigation)
+- Form Field (Input, Textarea, Select with proper labels and error states)
+- Modal (Confirmation, Form modals with focus management and escape key handling)
+- Card (Content containers with semantic HTML structure)
+- Badge (Status indicators with appropriate color contrast and text alternatives)
+- Loading Spinner (With ARIA live regions for screen readers)
+- Toast Notifications (With ARIA alerts and auto-dismiss functionality)
+
+**Accessibility Requirements:**
+
+- All interactive elements must have `tabindex="0"` and keyboard event handlers
+- ARIA labels and descriptions for complex UI elements
+- Proper color contrast ratios (WCAG 2.1 AA compliance)
+- Focus management for modals and dynamic content
+- Screen reader compatible markup and announcements
 
 ---
 

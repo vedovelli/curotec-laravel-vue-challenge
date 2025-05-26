@@ -24,19 +24,23 @@
 
 ### Backend (Laravel)
 
-- Single Action Controllers
-- Form Request Validation
-- API Resources for JSON transformation
-- Eloquent ORM with proper relationships
+- Single Action Controllers as final, read-only classes
+- Actions pattern with single `handle()` method
+- Form Request Validation with strict typing (`declare(strict_types=1)`)
+- API Resources for JSON transformation with type declarations
+- Eloquent ORM with final models and proper relationships
 - Database indexing for performance
+- PSR-12 compliance and method injection over constructor injection
 
 ### Frontend (Vue 3)
 
-- Composition API only
-- Pinia for state management
-- TypeScript for type safety
-- TailwindCSS for styling
-- Component composition pattern
+- Composition API exclusively with TypeScript
+- Pinia for state management with const functions
+- Descriptive naming with "handle" prefix for event functions
+- TailwindCSS exclusively (no CSS or `<style>` tags)
+- Component composition with accessibility features (ARIA, tabindex, keyboard navigation)
+- Early returns for improved code readability
+- Const functions over regular functions with explicit types
 
 ### Database Schema
 
