@@ -141,7 +141,7 @@ const getFilterAriaLabel = (option: (typeof filterOptions)[0]) => {
 <style scoped>
 /* Ensure proper focus visibility */
 button:focus-visible {
-  outline: 2px solid theme('colors.blue.500');
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
 

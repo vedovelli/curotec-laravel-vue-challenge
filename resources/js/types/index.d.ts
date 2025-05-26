@@ -56,3 +56,25 @@ export interface Task {
 export type TaskStatus = 'all' | 'pending' | 'completed';
 
 export type BreadcrumbItemType = BreadcrumbItem;
+
+// Pagination types based on Laravel's pagination
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedTasks {
+  data: Task[];
+  meta: PaginationMeta;
+  links: PaginationLink[];
+}

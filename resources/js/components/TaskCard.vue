@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils';
 import type { Task } from '@/types';
 import { formatTaskDate, getRelativeTimeText, isOverdue } from '@/utils/date';
+import { Link } from '@inertiajs/vue3';
 import { Calendar, CheckCircle2, Circle, Clock } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -49,7 +50,7 @@ const isTaskOverdue = computed(() => {
 
 const cardClasses = computed(() => {
   const baseClasses =
-    'group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900';
+    'group relative block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900';
 
   if (props.task.status === 'completed') {
     return cn(baseClasses, 'opacity-75 hover:opacity-100');
@@ -57,28 +58,13 @@ const cardClasses = computed(() => {
 
   return baseClasses;
 });
-
-const handleCardClick = () => {
-  // This will be implemented when we add navigation
-  console.log('Navigate to task:', props.task.id);
-};
-
-const handleCardKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault();
-    handleCardClick();
-  }
-};
 </script>
 
 <template>
-  <div
+  <Link
+    :href="route('tasks.show', task.id)"
     :class="cn(cardClasses, props.class)"
-    tabindex="0"
-    role="button"
     :aria-label="`View task: ${task.title}`"
-    @click="handleCardClick"
-    @keydown="handleCardKeydown"
   >
     <!-- Task Header -->
     <div class="mb-3 flex items-start justify-between gap-3">
@@ -136,21 +122,5 @@ const handleCardKeydown = (event: KeyboardEvent) => {
     <div
       class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors group-hover:border-blue-200 dark:group-hover:border-blue-800"
     />
-  </div>
+  </Link>
 </template>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

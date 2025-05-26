@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ListTasksController;
 use App\Http\Controllers\CreateTaskController;
 use App\Http\Controllers\UpdateTaskController;
 use App\Http\Controllers\DeleteTaskController;
@@ -18,6 +19,7 @@ Route::get('dashboard', DashboardController::class)
 
 // Task routes
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('tasks', ListTasksController::class)->name('tasks.index');
     Route::get('tasks/create', CreateTaskController::class)->name('tasks.create');
     Route::post('tasks', [CreateTaskController::class, 'store'])->name('tasks.store');
     Route::get('tasks/{task}', TaskController::class)->name('tasks.show');
