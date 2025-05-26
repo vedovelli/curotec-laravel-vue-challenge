@@ -5,13 +5,13 @@
 ### Project Overview
 
 **Project Name:** Curotec Laravel Vue Challenge  
-**Technology Stack:** Laravel 12.0+, Vue 3, Inertia.js, Pinia, TailwindCSS  
+**Technology Stack:** Laravel 12.0+, Vue 3, Inertia.js, TailwindCSS  
 **Project Type:** Full-stack web application demonstrating modern development practices  
 **Timeline:** Development sprint focused on core functionality
 
 ### Executive Summary
 
-This project demonstrates proficiency in modern full-stack development using Laravel as the backend API, Vue 3 for reactive frontend components, and Inertia.js for seamless SPA-like navigation. The application consists of two core features: a comprehensive task management system with advanced filtering and validation, and a real-time dashboard with global state management using Pinia.
+This project demonstrates proficiency in modern full-stack development using Laravel as the backend API, Vue 3 for reactive frontend components, and Inertia.js for seamless SPA-like navigation. The application consists of two core features: a comprehensive task management system with advanced filtering and validation, and a real-time dashboard with component-based state management.
 
 ### Business Objectives
 
@@ -163,7 +163,7 @@ A comprehensive task management system that allows users to perform full CRUD op
 
 #### Overview
 
-A dynamic dashboard that displays task analytics and statistics using Pinia for centralized state management, with optimistic UI updates and efficient data synchronization.
+A dynamic dashboard that displays task analytics and statistics using Vue 3's reactive state management, with optimistic UI updates and efficient data synchronization.
 
 #### User Stories
 
@@ -202,12 +202,12 @@ A dynamic dashboard that displays task analytics and statistics using Pinia for 
 
 #### Technical Requirements
 
-**State Management (Pinia):**
+**State Management (Vue 3 Reactive):**
 
-- Centralized task store with actions, getters, and state
-- Computed statistics derived from task data
+- Component-based reactive state using Vue 3's Composition API
+- Computed statistics derived from task data using computed properties
 - Optimistic updates with rollback capability
-- Persistent state across navigation
+- State persistence using query parameters with server/database as source of truth
 
 **Backend Optimization:**
 
@@ -226,10 +226,10 @@ A dynamic dashboard that displays task analytics and statistics using Pinia for 
 - Early returns in component logic for improved readability
 - TailwindCSS exclusively for styling (no CSS or `<style>` tags)
 
-#### Pinia Store Structure
+#### Vue 3 Reactive State Management Structure
 
 ```typescript
-// stores/taskStore.ts
+// composables/useTaskState.ts
 interface TaskState {
   tasks: Task[];
   loading: boolean;
@@ -239,25 +239,17 @@ interface TaskState {
   };
 }
 
-interface TaskGetters {
-  completedTasks: Task[];
-  pendingTasks: Task[];
-  totalTasks: number;
-  completionPercentage: number;
-  recentTasks: Task[];
-  overdueTasks: Task[];
+interface TaskComputedProperties {
+  completedTasks: ComputedRef<Task[]>;
+  pendingTasks: ComputedRef<Task[]>;
+  totalTasks: ComputedRef<number>;
+  completionPercentage: ComputedRef<number>;
+  recentTasks: ComputedRef<Task[]>;
+  overdueTasks: ComputedRef<Task[]>;
 }
 
-interface TaskActions {
-  handleFetchTasks(): Promise<void>;
-  handleCreateTask(task: CreateTaskData): Promise<void>;
-  handleUpdateTask(id: number, task: UpdateTaskData): Promise<void>;
-  handleDeleteTask(id: number): Promise<void>;
-  handleSetFilter(status: FilterStatus): void;
-}
-
-// Store implementation with const functions
-export const useTaskStore = defineStore('task', () => {
+// Composable implementation with const functions
+export const useTaskState = () => {
   const state = reactive<TaskState>({
     tasks: [],
     loading: false,
@@ -265,13 +257,39 @@ export const useTaskStore = defineStore('task', () => {
     filters: { status: 'all' },
   });
 
-  const handleFetchTasks = async (): Promise<void> => {
+  const completedTasks = computed(() => state.tasks.filter((task) => task.status === 'completed'));
+
+  const pendingTasks = computed(() => state.tasks.filter((task) => task.status === 'pending'));
+
+  const totalTasks = computed(() => state.tasks.length);
+
+  const completionPercentage = computed(() => {
+    if (totalTasks.value === 0) return 0;
+    return (completedTasks.value.length / totalTasks.value) * 100;
+  });
+
+  const handleFetchTasks = async (filters?: { status?: string }): Promise<void> => {
     // Implementation with early returns
     if (state.loading) return;
 
     state.loading = true;
     try {
-      // API call logic
+      // Use Inertia.js to navigate with query parameters
+      // Server will filter tasks based on query params and return filtered data
+      const queryParams = new URLSearchParams();
+      if (filters?.status && filters.status !== 'all') {
+        queryParams.set('status', filters.status);
+      }
+
+      await router.get(
+        `/tasks?${queryParams.toString()}`,
+        {},
+        {
+          preserveState: true,
+          preserveScroll: true,
+          only: ['tasks', 'stats'],
+        }
+      );
     } catch (error) {
       state.error = 'Failed to fetch tasks';
       return;
@@ -282,10 +300,14 @@ export const useTaskStore = defineStore('task', () => {
 
   return {
     ...toRefs(state),
+    completedTasks,
+    pendingTasks,
+    totalTasks,
+    completionPercentage,
     handleFetchTasks,
-    // other actions...
+    // other methods...
   };
-});
+};
 ```
 
 #### Acceptance Criteria
@@ -299,8 +321,8 @@ export const useTaskStore = defineStore('task', () => {
 
 ✅ **State Management**
 
-- [ ] Pinia store manages all task-related state
-- [ ] State updates propagate to all components
+- [ ] Vue 3 reactive state manages all task-related data
+- [ ] State updates propagate to all components using computed properties
 - [ ] Optimistic updates provide immediate feedback
 - [ ] Error states are handled gracefully
 
@@ -386,9 +408,9 @@ resources/js/
 │   │   ├── Index.vue
 │   │   └── Create.vue
 │   └── Dashboard.vue
-├── Stores/
-│   ├── taskStore.ts
-│   └── dashboardStore.ts
+├── Composables/
+│   ├── useTaskState.ts
+│   └── useDashboardState.ts
 └── Types/
     ├── Task.ts
     └── Dashboard.ts
@@ -397,7 +419,7 @@ resources/js/
 **Key Patterns:**
 
 - Composition API exclusively with TypeScript for type safety
-- Pinia for state management with const functions and descriptive naming
+- Vue 3 Composition API for reactive state management with const functions and descriptive naming
 - Component composition for reusability with accessibility features
 - TailwindCSS exclusively for styling (no CSS or `<style>` tags)
 - Descriptive function naming with "handle" prefix for event handlers
@@ -727,7 +749,7 @@ const handleSubmit = async (): Promise<void> => {
 
 **Integration Tests:**
 
-- Pinia store actions and getters
+- Vue 3 composable functions and computed properties
 - Component communication
 - Form submission workflows
 - Navigation and routing
@@ -808,7 +830,7 @@ const handleSubmit = async (): Promise<void> => {
 
 **Risk**: Complex state management leading to bugs
 
-- **Mitigation**: Comprehensive testing of Pinia stores and component interactions
+- **Mitigation**: Comprehensive testing of Vue 3 composables and component interactions
 
 **Risk**: Performance issues with large task lists
 
