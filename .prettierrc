@@ -1,12 +1,18 @@
 {
     "semi": true,
+    "trailingComma": "es5",
     "singleQuote": true,
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "vueIndentScriptAndStyle": false,
     "singleAttributePerLine": false,
     "htmlWhitespaceSensitivity": "css",
-    "printWidth": 150,
     "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
     "tailwindFunctions": ["clsx", "cn"],
-    "tabWidth": 4,
     "overrides": [
         {
             "files": "**/*.yml",
