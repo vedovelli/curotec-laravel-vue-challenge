@@ -90,4 +90,25 @@ it('calculates completion percentage correctly with decimal precision', function
         ->and($stats['completed_tasks'])->toBe(1)
         ->and($stats['pending_tasks'])->toBe(2)
         ->and($stats['completion_percentage'])->toBe(33.33);
+});
+
+it('can be resolved from service container with dependency injection', function (): void {
+    // Arrange
+    Task::factory()->count(3)->create(['status' => 'completed']);
+    Task::factory()->count(2)->create(['status' => 'pending']);
+    
+    // Act
+    $action = app(GetTaskStatsAction::class);
+
+    // Assert
+    expect($action)->toBeInstanceOf(GetTaskStatsAction::class);
+    
+    // Verify it works with dependency injection
+    $stats = $action->handle();
+    
+    expect($stats)->toHaveKey('total_tasks')
+        ->and($stats['total_tasks'])->toBe(5)
+        ->and($stats['completed_tasks'])->toBe(3)
+        ->and($stats['pending_tasks'])->toBe(2)
+        ->and($stats['completion_percentage'])->toBe(60.0);
 }); 

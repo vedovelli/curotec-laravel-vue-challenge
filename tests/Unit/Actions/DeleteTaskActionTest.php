@@ -41,4 +41,21 @@ it('throws exception for non-existent task', function (): void {
         ->toThrow(ModelNotFoundException::class);
 });
 
+it('can be resolved from service container with dependency injection', function (): void {
+    // Arrange
+    $task = Task::factory()->create();
+    
+    // Act
+    $action = app(DeleteTaskAction::class);
+
+    // Assert
+    expect($action)->toBeInstanceOf(DeleteTaskAction::class);
+    
+    // Verify it works with dependency injection
+    $result = $action->handle($task->id);
+    
+    expect($result)->toBeTrue();
+    $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+});
+
  

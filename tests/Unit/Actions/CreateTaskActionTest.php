@@ -121,3 +121,22 @@ it('accepts task model in constructor', function (): void {
     // Assert
     expect($action)->toBeInstanceOf(CreateTaskAction::class);
 });
+
+it('can be resolved from service container with dependency injection', function (): void {
+    // Act
+    $action = app(CreateTaskAction::class);
+
+    // Assert
+    expect($action)->toBeInstanceOf(CreateTaskAction::class);
+    
+    // Verify it works with dependency injection
+    $taskData = [
+        'title' => 'Container Resolved Task',
+        'status' => 'pending',
+    ];
+    
+    $task = $action->handle($taskData);
+    expect($task)->toBeInstanceOf(Task::class)
+        ->and($task->title)->toBe('Container Resolved Task')
+        ->and($task->exists)->toBeTrue();
+});

@@ -129,3 +129,22 @@ it('accepts task model in constructor', function (): void {
     // Assert
     expect($action)->toBeInstanceOf(UpdateTaskAction::class);
 });
+
+it('can be resolved from service container with dependency injection', function (): void {
+    // Arrange
+    $task = Task::factory()->create(['title' => 'Original Title']);
+    
+    // Act
+    $action = app(UpdateTaskAction::class);
+
+    // Assert
+    expect($action)->toBeInstanceOf(UpdateTaskAction::class);
+    
+    // Verify it works with dependency injection
+    $updateData = ['title' => 'Container Updated Title'];
+    $updatedTask = $action->handle($task->id, $updateData);
+    
+    expect($updatedTask)->toBeInstanceOf(Task::class)
+        ->and($updatedTask->title)->toBe('Container Updated Title')
+        ->and($updatedTask->id)->toBe($task->id);
+});
