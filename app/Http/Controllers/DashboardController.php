@@ -17,7 +17,7 @@ use Inertia\Response;
  * Handles the main dashboard view that displays task overview,
  * statistics, and paginated task list for the Inertia.js application.
  */
-final class DashboardController extends Controller
+class DashboardController extends Controller
 {
     public function __construct(
         private readonly Task $task,
