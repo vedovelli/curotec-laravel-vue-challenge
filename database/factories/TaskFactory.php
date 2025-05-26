@@ -27,9 +27,9 @@ final class TaskFactory extends Factory
     {
         return [
             'title' => $this->generateTaskTitle(),
-            'description' => $this->faker->optional(0.8)->paragraph(),
-            'status' => $this->faker->randomElement(['pending', 'completed']),
-            'due_date' => $this->faker->optional(0.6)->dateTimeBetween('now', '+30 days'),
+            'description' => fake()->optional(0.8)->paragraph(),
+            'status' => fake()->randomElement(['pending', 'completed']),
+            'due_date' => fake()->optional(0.6)->dateTimeBetween('now', '+30 days'),
         ];
     }
 
@@ -69,8 +69,8 @@ final class TaskFactory extends Factory
             'mobile responsiveness',
         ];
 
-        $taskType = $this->faker->randomElement($taskTypes);
-        $subject = $this->faker->randomElement($subjects);
+        $taskType = fake()->randomElement($taskTypes);
+        $subject = fake()->randomElement($subjects);
 
         return "{$taskType} {$subject}";
     }
@@ -82,7 +82,7 @@ final class TaskFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'pending',
-            'due_date' => $this->faker->optional(0.7)->dateTimeBetween('now', '+14 days'),
+            'due_date' => fake()->optional(0.7)->dateTimeBetween('now', '+14 days'),
         ]);
     }
 
@@ -93,7 +93,7 @@ final class TaskFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
-            'due_date' => $this->faker->optional(0.5)->dateTimeBetween('-30 days', 'now'),
+            'due_date' => fake()->optional(0.5)->dateTimeBetween('-30 days', 'now'),
         ]);
     }
 
@@ -104,7 +104,7 @@ final class TaskFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'pending',
-            'due_date' => $this->faker->dateTimeBetween('-14 days', '-1 day'),
+            'due_date' => fake()->dateTimeBetween('-14 days', '-1 day'),
         ]);
     }
 
@@ -134,7 +134,7 @@ final class TaskFactory extends Factory
     public function withLongDescription(): static
     {
         return $this->state(fn (array $attributes) => [
-            'description' => $this->faker->paragraphs(3, true),
+            'description' => fake()->paragraphs(3, true),
         ]);
     }
 
