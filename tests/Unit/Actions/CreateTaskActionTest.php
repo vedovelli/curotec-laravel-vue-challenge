@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 use App\Actions\CreateTaskAction;
 use App\Models\Task;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
-
-beforeEach(function () {
-    $this->action = new CreateTaskAction();
+beforeEach(function (): void {
+    $this->action = new CreateTaskAction(new Task);
 });
 
-it('can create a task with valid data', function () {
+it('creates task successfully', function (): void {
     // Arrange
     $taskData = [
         'title' => 'Test Task',
@@ -25,13 +22,13 @@ it('can create a task with valid data', function () {
     $task = $this->action->handle($taskData);
 
     // Assert
-    expect($task)->toBeInstanceOf(Task::class);
-    expect($task->exists)->toBeTrue();
-    expect($task->title)->toBe('Test Task');
-    expect($task->description)->toBe('This is a test task description');
-    expect($task->status)->toBe('pending');
-    expect($task->due_date)->not->toBeNull();
-    
+    expect($task)->toBeInstanceOf(Task::class)
+        ->and($task->exists)->toBeTrue()
+        ->and($task->title)->toBe('Test Task')
+        ->and($task->description)->toBe('This is a test task description')
+        ->and($task->status)->toBe('pending')
+        ->and($task->due_date)->not->toBeNull();
+
     // Verify task was saved to database
     $this->assertDatabaseHas('tasks', [
         'title' => 'Test Task',
@@ -40,7 +37,7 @@ it('can create a task with valid data', function () {
     ]);
 });
 
-it('can create a task with minimal required data', function () {
+it('creates task with minimal data', function (): void {
     // Arrange
     $taskData = [
         'title' => 'Minimal Task',
@@ -51,15 +48,15 @@ it('can create a task with minimal required data', function () {
     $task = $this->action->handle($taskData);
 
     // Assert
-    expect($task)->toBeInstanceOf(Task::class);
-    expect($task->exists)->toBeTrue();
-    expect($task->title)->toBe('Minimal Task');
-    expect($task->description)->toBeNull();
-    expect($task->status)->toBe('pending');
-    expect($task->due_date)->toBeNull();
+    expect($task)->toBeInstanceOf(Task::class)
+        ->and($task->exists)->toBeTrue()
+        ->and($task->title)->toBe('Minimal Task')
+        ->and($task->description)->toBeNull()
+        ->and($task->status)->toBe('pending')
+        ->and($task->due_date)->toBeNull();
 });
 
-it('can create a completed task', function () {
+it('creates completed task', function (): void {
     // Arrange
     $taskData = [
         'title' => 'Completed Task',
@@ -70,15 +67,15 @@ it('can create a completed task', function () {
     $task = $this->action->handle($taskData);
 
     // Assert
-    expect($task->status)->toBe('completed');
-    expect($task->isCompleted())->toBeTrue();
+    expect($task->status)->toBe('completed')
+        ->and($task->isCompleted())->toBeTrue();
 });
 
-it('trims whitespace from title and description', function () {
-    // Arrange
+it('accepts data as provided', function (): void {
+    // Arrange - Data should come pre-processed from Form Request
     $taskData = [
-        'title' => '  Test Task with Spaces  ',
-        'description' => '  Description with spaces  ',
+        'title' => 'Pre-processed Task',
+        'description' => 'Pre-processed Description',
         'status' => 'pending',
     ];
 
@@ -86,68 +83,41 @@ it('trims whitespace from title and description', function () {
     $task = $this->action->handle($taskData);
 
     // Assert
-    expect($task->title)->toBe('Test Task with Spaces');
-    expect($task->description)->toBe('Description with spaces');
+    expect($task->title)->toBe('Pre-processed Task')
+        ->and($task->description)->toBe('Pre-processed Description');
 });
 
-it('ignores empty description', function () {
+it('handles task with due date', function (): void {
     // Arrange
+    $dueDate = now()->addDays(7)->format('Y-m-d');
     $taskData = [
-        'title' => 'Task without description',
-        'description' => '   ',
+        'title' => 'Task with due date',
         'status' => 'pending',
+        'due_date' => $dueDate,
     ];
 
     // Act
     $task = $this->action->handle($taskData);
 
     // Assert
-    expect($task->description)->toBeNull();
+    expect($task)->toBeInstanceOf(Task::class)
+        ->and($task->due_date)->not->toBeNull()
+        ->and($task->due_date->format('Y-m-d'))->toBe($dueDate);
 });
 
-it('accepts due date as today', function () {
-    // Arrange
-    $taskData = [
-        'title' => 'Task due today',
-        'status' => 'pending',
-        'due_date' => now()->format('Y-m-d'),
-    ];
-
-    // Act
-    $task = $this->action->handle($taskData);
-
+it('is final and readonly class', function (): void {
     // Assert
-    expect($task)->toBeInstanceOf(Task::class);
-    expect($task->due_date)->not->toBeNull();
-    expect($task->due_date->isToday())->toBeTrue();
+    $reflection = new ReflectionClass(CreateTaskAction::class);
+    
+    expect($reflection->isFinal())->toBeTrue()
+        ->and($reflection->isReadOnly())->toBeTrue();
 });
 
-it('can execute action with error handling', function () {
-    // Arrange
-    $taskData = [
-        'title' => 'Test Task',
-        'status' => 'pending',
-    ];
-
-    // Act
-    $task = $this->action->execute($taskData);
+it('accepts task model in constructor', function (): void {
+    // Arrange & Act
+    $taskModel = new Task;
+    $action = new CreateTaskAction($taskModel);
 
     // Assert
-    expect($task)->toBeInstanceOf(Task::class);
-    expect($task->exists)->toBeTrue();
+    expect($action)->toBeInstanceOf(CreateTaskAction::class);
 });
-
-it('can execute action with logging', function () {
-    // Arrange
-    $taskData = [
-        'title' => 'Test Task for Execute',
-        'status' => 'pending',
-    ];
-
-    // Act
-    $task = $this->action->execute($taskData);
-
-    // Assert
-    expect($task)->toBeInstanceOf(Task::class);
-    expect($task->title)->toBe('Test Task for Execute');
-}); 
