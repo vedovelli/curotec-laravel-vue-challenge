@@ -62,20 +62,20 @@ A comprehensive task management system that allows users to perform full CRUD op
 **CRUD Operations:**
 
 1. **Create Task**
-    - Form with title, description, status, and due date fields
-    - Real-time validation with custom Laravel Form Request
-    - Success feedback with task added to list immediately
+   - Form with title, description, status, and due date fields
+   - Real-time validation with custom Laravel Form Request
+   - Success feedback with task added to list immediately
 2. **Read Tasks**
-    - Paginated list view with responsive design
-    - Status badges with color coding
-    - Due date formatting with overdue indicators
+   - Paginated list view with responsive design
+   - Status badges with color coding
+   - Due date formatting with overdue indicators
 3. **Update Task**
-    - Inline editing or modal-based editing
-    - Pre-populated form with existing data
-    - Optimistic UI updates
+   - Inline editing or modal-based editing
+   - Pre-populated form with existing data
+   - Optimistic UI updates
 4. **Delete Task**
-    - Confirmation dialog before deletion
-    - Immediate removal from UI with rollback capability
+   - Confirmation dialog before deletion
+   - Immediate removal from UI with rollback capability
 
 **Filtering System:**
 
@@ -89,7 +89,7 @@ A comprehensive task management system that allows users to perform full CRUD op
 **Backend (Laravel):**
 
 - Task model as final class with strict typing (`declare(strict_types=1)`)
-- Single-action controllers as final, read-only classes (no property mutations)
+- Single-action controllers (no property mutations)
 - Actions pattern for business logic with single `handle()` method
 - Custom Form Request validation classes with explicit return types
 - API resource transformers for consistent JSON responses
@@ -180,18 +180,18 @@ A dynamic dashboard that displays task analytics and statistics using Pinia for 
 **Dashboard Components:**
 
 1. **Statistics Cards**
-    - Total tasks count
-    - Completed tasks count
-    - Pending tasks count
-    - Completion percentage
+   - Total tasks count
+   - Completed tasks count
+   - Pending tasks count
+   - Completion percentage
 2. **Recent Activity Feed**
-    - Latest task creations
-    - Recent completions
-    - Upcoming due dates
+   - Latest task creations
+   - Recent completions
+   - Upcoming due dates
 3. **Quick Actions Panel**
-    - Create new task shortcut
-    - Mark tasks complete quickly
-    - Filter shortcuts
+   - Create new task shortcut
+   - Mark tasks complete quickly
+   - Filter shortcuts
 
 **Real-time Features:**
 
@@ -231,60 +231,60 @@ A dynamic dashboard that displays task analytics and statistics using Pinia for 
 ```typescript
 // stores/taskStore.ts
 interface TaskState {
-    tasks: Task[];
-    loading: boolean;
-    error: string | null;
-    filters: {
-        status: 'all' | 'pending' | 'completed';
-    };
+  tasks: Task[];
+  loading: boolean;
+  error: string | null;
+  filters: {
+    status: 'all' | 'pending' | 'completed';
+  };
 }
 
 interface TaskGetters {
-    completedTasks: Task[];
-    pendingTasks: Task[];
-    totalTasks: number;
-    completionPercentage: number;
-    recentTasks: Task[];
-    overdueTasks: Task[];
+  completedTasks: Task[];
+  pendingTasks: Task[];
+  totalTasks: number;
+  completionPercentage: number;
+  recentTasks: Task[];
+  overdueTasks: Task[];
 }
 
 interface TaskActions {
-    handleFetchTasks(): Promise<void>;
-    handleCreateTask(task: CreateTaskData): Promise<void>;
-    handleUpdateTask(id: number, task: UpdateTaskData): Promise<void>;
-    handleDeleteTask(id: number): Promise<void>;
-    handleSetFilter(status: FilterStatus): void;
+  handleFetchTasks(): Promise<void>;
+  handleCreateTask(task: CreateTaskData): Promise<void>;
+  handleUpdateTask(id: number, task: UpdateTaskData): Promise<void>;
+  handleDeleteTask(id: number): Promise<void>;
+  handleSetFilter(status: FilterStatus): void;
 }
 
 // Store implementation with const functions
 export const useTaskStore = defineStore('task', () => {
-    const state = reactive<TaskState>({
-        tasks: [],
-        loading: false,
-        error: null,
-        filters: { status: 'all' },
-    });
+  const state = reactive<TaskState>({
+    tasks: [],
+    loading: false,
+    error: null,
+    filters: { status: 'all' },
+  });
 
-    const handleFetchTasks = async (): Promise<void> => {
-        // Implementation with early returns
-        if (state.loading) return;
+  const handleFetchTasks = async (): Promise<void> => {
+    // Implementation with early returns
+    if (state.loading) return;
 
-        state.loading = true;
-        try {
-            // API call logic
-        } catch (error) {
-            state.error = 'Failed to fetch tasks';
-            return;
-        } finally {
-            state.loading = false;
-        }
-    };
+    state.loading = true;
+    try {
+      // API call logic
+    } catch (error) {
+      state.error = 'Failed to fetch tasks';
+      return;
+    } finally {
+      state.loading = false;
+    }
+  };
 
-    return {
-        ...toRefs(state),
-        handleFetchTasks,
-        // other actions...
-    };
+  return {
+    ...toRefs(state),
+    handleFetchTasks,
+    // other actions...
+  };
 });
 ```
 
@@ -452,7 +452,7 @@ use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
-final readonly class CreateTaskController
+class CreateTaskController
 {
     public function __invoke(
         CreateTaskRequest $request,
@@ -505,32 +505,34 @@ final readonly class CreateTaskAction
 
 ```vue
 <template>
-    <form @submit.prevent="handleSubmit" class="space-y-4 rounded-lg bg-white p-6 shadow-md">
-        <div>
-            <label for="task-title" class="mb-2 block text-sm font-medium text-gray-700"> Task Title </label>
-            <input
-                id="task-title"
-                v-model="form.title"
-                type="text"
-                required
-                aria-describedby="title-error"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <span v-if="errors.title" id="title-error" class="mt-1 text-sm text-red-600" role="alert">
-                {{ errors.title }}
-            </span>
-        </div>
+  <form @submit.prevent="handleSubmit" class="space-y-4 rounded-lg bg-white p-6 shadow-md">
+    <div>
+      <label for="task-title" class="mb-2 block text-sm font-medium text-gray-700">
+        Task Title
+      </label>
+      <input
+        id="task-title"
+        v-model="form.title"
+        type="text"
+        required
+        aria-describedby="title-error"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <span v-if="errors.title" id="title-error" class="mt-1 text-sm text-red-600" role="alert">
+        {{ errors.title }}
+      </span>
+    </div>
 
-        <button
-            type="submit"
-            :disabled="isSubmitting"
-            tabindex="0"
-            aria-label="Create new task"
-            class="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-        >
-            {{ isSubmitting ? 'Creating...' : 'Create Task' }}
-        </button>
-    </form>
+    <button
+      type="submit"
+      :disabled="isSubmitting"
+      tabindex="0"
+      aria-label="Create new task"
+      class="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+    >
+      {{ isSubmitting ? 'Creating...' : 'Create Task' }}
+    </button>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -538,17 +540,17 @@ import { reactive, ref } from 'vue';
 import { useTaskStore } from '@/stores/taskStore';
 
 interface TaskForm {
-    title: string;
-    description: string;
-    status: 'pending' | 'completed';
-    due_date: string | null;
+  title: string;
+  description: string;
+  status: 'pending' | 'completed';
+  due_date: string | null;
 }
 
 interface FormErrors {
-    title?: string;
-    description?: string;
-    status?: string;
-    due_date?: string;
+  title?: string;
+  description?: string;
+  status?: string;
+  due_date?: string;
 }
 
 const taskStore = useTaskStore();
@@ -556,33 +558,33 @@ const isSubmitting = ref<boolean>(false);
 const errors = ref<FormErrors>({});
 
 const form = reactive<TaskForm>({
-    title: '',
-    description: '',
-    status: 'pending',
-    due_date: null,
+  title: '',
+  description: '',
+  status: 'pending',
+  due_date: null,
 });
 
 const handleSubmit = async (): Promise<void> => {
-    if (isSubmitting.value) return;
+  if (isSubmitting.value) return;
 
-    isSubmitting.value = true;
-    errors.value = {};
+  isSubmitting.value = true;
+  errors.value = {};
 
-    try {
-        await taskStore.handleCreateTask(form);
-        // Reset form on success
-        Object.assign(form, {
-            title: '',
-            description: '',
-            status: 'pending',
-            due_date: null,
-        });
-    } catch (error) {
-        errors.value = error.response?.data?.errors || { title: 'An error occurred' };
-        return;
-    } finally {
-        isSubmitting.value = false;
-    }
+  try {
+    await taskStore.handleCreateTask(form);
+    // Reset form on success
+    Object.assign(form, {
+      title: '',
+      description: '',
+      status: 'pending',
+      due_date: null,
+    });
+  } catch (error) {
+    errors.value = error.response?.data?.errors || { title: 'An error occurred' };
+    return;
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 ```
@@ -658,21 +660,21 @@ const handleSubmit = async (): Promise<void> => {
 
 1. **Database Optimization**
 
-    - Proper indexing on frequently queried columns
-    - Eager loading for related data
-    - Query result caching for dashboard statistics
+   - Proper indexing on frequently queried columns
+   - Eager loading for related data
+   - Query result caching for dashboard statistics
 
 2. **Frontend Optimization**
 
-    - Component lazy loading
-    - Optimistic UI updates
-    - Efficient reactivity with computed properties
-    - Minimal re-renders with proper key usage
+   - Component lazy loading
+   - Optimistic UI updates
+   - Efficient reactivity with computed properties
+   - Minimal re-renders with proper key usage
 
 3. **Network Optimization**
-    - API response compression
-    - Efficient JSON serialization
-    - Minimal payload sizes
+   - API response compression
+   - Efficient JSON serialization
+   - Minimal payload sizes
 
 ---
 
@@ -762,16 +764,16 @@ const handleSubmit = async (): Promise<void> => {
 
 1. **Backend Build**
 
-    - Composer dependency installation
-    - Database migrations and seeding
-    - Configuration caching
-    - Route caching
+   - Composer dependency installation
+   - Database migrations and seeding
+   - Configuration caching
+   - Route caching
 
 2. **Frontend Build**
-    - NPM dependency installation
-    - Vite asset compilation
-    - TypeScript compilation
-    - CSS optimization
+   - NPM dependency installation
+   - Vite asset compilation
+   - TypeScript compilation
+   - CSS optimization
 
 ---
 
@@ -834,47 +836,47 @@ const handleSubmit = async (): Promise<void> => {
 
 1. **User Authentication & Multi-tenancy**
 
-    - User registration and login
-    - Task ownership and sharing
-    - Team collaboration features
+   - User registration and login
+   - Task ownership and sharing
+   - Team collaboration features
 
 2. **Advanced Task Features**
 
-    - Task categories and tags
-    - File attachments
-    - Task comments and history
-    - Recurring tasks
+   - Task categories and tags
+   - File attachments
+   - Task comments and history
+   - Recurring tasks
 
 3. **Enhanced Dashboard**
 
-    - Customizable widgets
-    - Data export functionality
-    - Advanced analytics and reporting
-    - Calendar integration
+   - Customizable widgets
+   - Data export functionality
+   - Advanced analytics and reporting
+   - Calendar integration
 
 4. **Mobile Application**
-    - Native mobile app using Vue Native or React Native
-    - Offline capability with sync
-    - Push notifications
+   - Native mobile app using Vue Native or React Native
+   - Offline capability with sync
+   - Push notifications
 
 ### Technical Improvements
 
 1. **Performance Optimization**
 
-    - Redis caching layer
-    - Database query optimization
-    - CDN integration for assets
+   - Redis caching layer
+   - Database query optimization
+   - CDN integration for assets
 
 2. **Developer Experience**
 
-    - Automated testing pipeline
-    - Code quality gates
-    - Automated deployment
+   - Automated testing pipeline
+   - Code quality gates
+   - Automated deployment
 
 3. **Monitoring & Observability**
-    - Application performance monitoring
-    - Error tracking and alerting
-    - User analytics and behavior tracking
+   - Application performance monitoring
+   - Error tracking and alerting
+   - User analytics and behavior tracking
 
 ---
 
