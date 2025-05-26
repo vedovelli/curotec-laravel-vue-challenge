@@ -19,7 +19,7 @@ final readonly class GetTaskStatsAction
         $pendingTasks = $this->task->where('status', Task::STATUS_PENDING)->count();
         
         $completionPercentage = $totalTasks > 0 
-            ? round(($completedTasks / $totalTasks) * 100, 2) 
+            ? (float) round(($completedTasks / $totalTasks) * 100, 2) 
             : 0.0;
 
         return [
