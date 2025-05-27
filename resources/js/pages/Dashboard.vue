@@ -16,16 +16,24 @@ interface Task {
   title: string;
   description: string;
   status: string;
-  priority?: string;
+  status_text: string;
+  priority_level?: string;
   due_date: string | null;
+  formatted_due_date: string | null;
+  is_completed: boolean;
+  is_overdue: boolean;
+  days_until_due: number | null;
   created_at: string;
   updated_at: string;
 }
 
+interface TaskCollection {
+  data: Task[];
+}
+
 interface DashboardProps {
-  tasks: Task[];
+  tasks: TaskCollection;
   stats: TaskStats;
-  pagination: any;
 }
 
 const props = defineProps<DashboardProps>();
@@ -36,6 +44,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: '/dashboard',
   },
 ];
+
+// Extract tasks from the data wrapper
+const taskList = computed(() => props.tasks?.data || []);
 
 const stats = computed(() => [
   {
@@ -91,10 +102,14 @@ const getStatusBadgeClass = (status: string) => {
 const getPriorityBadgeClass = (priority: string) => {
   switch (priority?.toLowerCase()) {
     case 'high':
+    case 'urgent':
       return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
     case 'medium':
+    case 'normal':
       return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
     case 'low':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+    case 'completed':
       return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
     default:
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
@@ -109,6 +124,10 @@ const formatDate = (dateString: string | null) => {
     day: 'numeric',
     year: 'numeric',
   });
+};
+
+const formatPriorityText = (priority: string) => {
+  return priority?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Normal';
 };
 </script>
 
@@ -177,18 +196,18 @@ const formatDate = (dateString: string | null) => {
         </div>
       </div>
 
-      <!-- High Priority Tasks Table -->
+      <!-- Recent Tasks Table -->
       <div
         class="border-sidebar-border/70 dark:border-sidebar-border bg-background relative overflow-hidden rounded-xl border"
       >
         <div class="p-6 pb-0">
           <div class="mb-4 flex items-center justify-between">
             <div>
-              <h3 class="text-foreground text-lg font-semibold">High Priority Tasks</h3>
-              <p class="text-muted-foreground text-sm">Top 6 pending tasks that need attention</p>
+              <h3 class="text-foreground text-lg font-semibold">Recent Tasks</h3>
+              <p class="text-muted-foreground text-sm">Latest 5 tasks from your project</p>
             </div>
             <a
-              href="/tasks?status=pending"
+              href="/tasks"
               class="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
             >
               View all →
@@ -229,7 +248,7 @@ const formatDate = (dateString: string | null) => {
             </thead>
             <tbody class="divide-border divide-y">
               <tr
-                v-for="task in props.tasks"
+                v-for="task in taskList"
                 :key="task.id"
                 class="hover:bg-muted/50 transition-colors"
               >
@@ -245,10 +264,10 @@ const formatDate = (dateString: string | null) => {
                   <span
                     :class="[
                       'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                      getPriorityBadgeClass(task.priority || 'medium'),
+                      getPriorityBadgeClass(task.priority_level || 'normal'),
                     ]"
                   >
-                    {{ task.priority || 'Medium' }}
+                    {{ formatPriorityText(task.priority_level || 'normal') }}
                   </span>
                 </td>
                 <td class="px-6 py-4">
@@ -258,11 +277,11 @@ const formatDate = (dateString: string | null) => {
                       getStatusBadgeClass(task.status),
                     ]"
                   >
-                    {{ task.status.replace('_', ' ') }}
+                    {{ task.status_text || task.status.replace('_', ' ') }}
                   </span>
                 </td>
                 <td class="text-muted-foreground px-6 py-4 text-sm">
-                  {{ formatDate(task.due_date) }}
+                  {{ task.formatted_due_date || formatDate(task.due_date) }}
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
@@ -282,12 +301,12 @@ const formatDate = (dateString: string | null) => {
                   </div>
                 </td>
               </tr>
-              <tr v-if="props.tasks.length === 0">
+              <tr v-if="taskList.length === 0">
                 <td colspan="5" class="text-muted-foreground px-6 py-8 text-center">
                   <div class="flex flex-col items-center gap-2">
                     <span class="text-2xl">🎉</span>
-                    <span>No pending high priority tasks!</span>
-                    <span class="text-xs">All caught up with your important work.</span>
+                    <span>No tasks yet!</span>
+                    <span class="text-xs">Create your first task to get started.</span>
                   </div>
                 </td>
               </tr>

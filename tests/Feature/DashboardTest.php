@@ -32,9 +32,6 @@ test('dashboard returns correct inertia response structure', function (): void {
     $this->get('/dashboard')
         ->assertInertia(fn (Assert $page) => $page
             ->component('Dashboard')
-            ->has('tasks')
-            ->has('stats')
-            ->has('pagination')
             ->has('tasks.data', 5)
             ->has('stats', fn (Assert $stats) => $stats
                 ->has('total_tasks')
@@ -42,14 +39,6 @@ test('dashboard returns correct inertia response structure', function (): void {
                 ->has('pending_tasks')
                 ->has('completion_percentage')
             )
-            ->has('pagination.data')
-            ->has('pagination.current_page')
-            ->has('pagination.last_page')
-            ->has('pagination.per_page')
-            ->has('pagination.total')
-            ->has('pagination.from')
-            ->has('pagination.to')
-            ->has('pagination.links')
         );
 });
 
@@ -83,21 +72,16 @@ test('dashboard includes task resource fields', function (): void {
         );
 });
 
-test('dashboard paginates tasks correctly', function (): void {
+test('dashboard limits tasks to 5 items', function (): void {
     // Arrange
     $this->actingAs($this->user);
-    Task::factory()->count(15)->create();
+    Task::factory()->count(10)->create();
 
     // Act & Assert
     $this->get('/dashboard')
         ->assertInertia(fn (Assert $page) => $page
             ->component('Dashboard')
-            ->has('tasks.data', 10) // Default pagination is 10
-            ->has('pagination')
-            ->where('pagination.current_page', 1)
-            ->where('pagination.last_page', 2)
-            ->where('pagination.per_page', 10)
-            ->where('pagination.total', 15)
+            ->has('tasks.data', 5) // Should only show 5 tasks even when more exist
         );
 });
 
@@ -133,7 +117,6 @@ test('dashboard uses BaseAction execute method with logging in debug mode', func
             ->component('Dashboard')
             ->has('tasks')
             ->has('stats')
-            ->has('pagination')
         );
     
     // Verify BaseAction logging was called for GetTaskStatsAction

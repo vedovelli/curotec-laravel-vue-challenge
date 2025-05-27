@@ -15,7 +15,7 @@ use Inertia\Response;
  * Dashboard Controller
  *
  * Handles the main dashboard view that displays task overview,
- * statistics, and paginated task list for the Inertia.js application.
+ * statistics, and a simple list of recent tasks for the Inertia.js application.
  */
 class DashboardController extends Controller
 {
@@ -30,14 +30,17 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request): Response
     {
-        $tasks = $this->task->pending()->get()->filter(
-            fn ($task) => $task->days_until_due < 1
-        )->take(5);
+        // Get 5 most recent tasks
+        $tasks = $this->task->query()
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
+        // Get task statistics
         $stats = $this->getTaskStatsAction->execute();
 
         return Inertia::render('Dashboard', [
-            'tasks' => $tasks,
+            'tasks' => TaskResource::collection($tasks),
             'stats' => $stats,
         ]);
     }
