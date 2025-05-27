@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Traits\TransformsPagination;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,7 +11,6 @@ use Inertia\Response;
 
 class ListTasksController extends Controller
 {
-    use TransformsPagination;
 
     public function __invoke(Request $request): Response
     {
@@ -43,11 +41,8 @@ class ListTasksController extends Controller
         // Append query parameters to pagination links
         $tasks->appends($request->query());
 
-        // Transform Laravel pagination to match frontend interface
-        $transformedTasks = $this->transformPagination($tasks);
-
         return Inertia::render('Tasks/Index', [
-            'tasks' => $transformedTasks,
+            'tasks' => $tasks,
             'currentFilter' => $filter,
         ]);
     }

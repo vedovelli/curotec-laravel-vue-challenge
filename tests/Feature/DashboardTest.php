@@ -42,16 +42,14 @@ test('dashboard returns correct inertia response structure', function (): void {
                 ->has('pending_tasks')
                 ->has('completion_percentage')
             )
-            ->has('pagination', fn (Assert $pagination) => $pagination
-                ->has('current_page')
-                ->has('last_page')
-                ->has('per_page')
-                ->has('total')
-                ->has('from')
-                ->has('to')
-                ->has('has_more_pages')
-                ->has('links')
-            )
+            ->has('pagination.data')
+            ->has('pagination.current_page')
+            ->has('pagination.last_page')
+            ->has('pagination.per_page')
+            ->has('pagination.total')
+            ->has('pagination.from')
+            ->has('pagination.to')
+            ->has('pagination.links')
         );
 });
 
@@ -100,7 +98,6 @@ test('dashboard paginates tasks correctly', function (): void {
             ->where('pagination.last_page', 2)
             ->where('pagination.per_page', 10)
             ->where('pagination.total', 15)
-            ->where('pagination.has_more_pages', true)
         );
 });
 

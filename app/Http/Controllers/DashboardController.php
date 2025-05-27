@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\GetTaskStatsAction;
 use App\Http\Resources\TaskResource;
-use App\Http\Traits\TransformsPagination;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,7 +19,6 @@ use Inertia\Response;
  */
 class DashboardController extends Controller
 {
-    use TransformsPagination;
 
     public function __construct(
         private readonly Task $task,
@@ -41,7 +39,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'tasks' => TaskResource::collection($tasks),
             'stats' => $stats,
-            'pagination' => $this->transformPaginationWithExtras($tasks),
+            'pagination' => $tasks,
         ]);
     }
 } 

@@ -27,7 +27,7 @@ const props = defineProps<Props>();
             <!-- Page Header -->
             <div class="mb-6 flex items-center justify-between">
               <h1 class="text-2xl font-bold text-gray-900">Tasks</h1>
-              <div class="text-sm text-gray-600">{{ props.tasks.meta.total }} total tasks</div>
+              <div class="text-sm text-gray-600">{{ props.tasks.total }} total tasks</div>
             </div>
 
             <!-- Task List -->

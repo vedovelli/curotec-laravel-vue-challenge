@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import type { PaginatedTasks, PaginationLink, TaskStatus } from '@/types';
+import type { PaginatedTasks, TaskStatus } from '@/types';
 import { router } from '@inertiajs/vue3';
 import { AlertCircle, Loader2 } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
@@ -38,11 +38,11 @@ onMounted(() => {
 
 // Computed properties
 const hasResults = computed(() => props.tasks.data.length > 0);
-const totalTasks = computed(() => props.tasks.meta.total);
-const currentPage = computed(() => props.tasks.meta.current_page);
-const lastPage = computed(() => props.tasks.meta.last_page);
-const showingFrom = computed(() => props.tasks.meta.from);
-const showingTo = computed(() => props.tasks.meta.to);
+const totalTasks = computed(() => props.tasks.total);
+const currentPage = computed(() => props.tasks.current_page);
+const lastPage = computed(() => props.tasks.last_page);
+const showingFrom = computed(() => props.tasks.from);
+const showingTo = computed(() => props.tasks.to);
 
 // Filter status text for accessibility
 const filterStatusText = computed(() => {
@@ -80,7 +80,7 @@ const handleResetFilters = () => {
 };
 
 // Pagination link classes
-const getPaginationLinkClasses = (link: PaginationLink) => {
+const getPaginationLinkClasses = (link: { url: string | null; active: boolean }) => {
   const baseClasses =
     'relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 focus:z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
@@ -105,6 +105,12 @@ const taskGridClasses = computed(() => {
     'xl:grid-cols-4'
   );
 });
+
+// Get previous and next links for mobile pagination
+const previousLink = computed(() =>
+  props.tasks.links.find((link) => link.label.includes('Previous'))
+);
+const nextLink = computed(() => props.tasks.links.find((link) => link.label.includes('Next')));
 </script>
 
 <template>
@@ -188,10 +194,10 @@ const taskGridClasses = computed(() => {
           <!-- Mobile Pagination -->
           <div class="flex w-0 flex-1 sm:hidden">
             <button
-              v-if="tasks.links[0]?.url"
+              v-if="previousLink?.url"
               type="button"
-              :class="getPaginationLinkClasses(tasks.links[0])"
-              @click="handlePaginationClick(tasks.links[0].url)"
+              :class="getPaginationLinkClasses(previousLink)"
+              @click="handlePaginationClick(previousLink.url)"
             >
               Previous
             </button>
@@ -240,10 +246,10 @@ const taskGridClasses = computed(() => {
           <!-- Mobile Next Button -->
           <div class="flex w-0 flex-1 justify-end sm:hidden">
             <button
-              v-if="tasks.links[tasks.links.length - 1]?.url"
+              v-if="nextLink?.url"
               type="button"
-              :class="getPaginationLinkClasses(tasks.links[tasks.links.length - 1])"
-              @click="handlePaginationClick(tasks.links[tasks.links.length - 1].url)"
+              :class="getPaginationLinkClasses(nextLink)"
+              @click="handlePaginationClick(nextLink.url)"
             >
               Next
             </button>
