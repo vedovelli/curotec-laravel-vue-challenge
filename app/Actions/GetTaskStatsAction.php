@@ -6,13 +6,18 @@ namespace App\Actions;
 
 use App\Models\Task;
 
-final readonly class GetTaskStatsAction
+class GetTaskStatsAction extends BaseAction
 {
     public function __construct(
         private Task $task
     ) {}
 
-    public function handle(): array
+    /**
+     * Get task statistics.
+     *
+     * @param  mixed  $input Not used for this action
+     */
+    public function handle(mixed $input = null): array
     {
         $totalTasks = $this->task->count();
         $completedTasks = $this->task->where('status', Task::STATUS_COMPLETED)->count();

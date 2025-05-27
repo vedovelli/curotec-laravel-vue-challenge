@@ -49,3 +49,4 @@ tasks.json
 tasks/ 
 .cursor
 README-task-master.md
+.repomix-output.txt

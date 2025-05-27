@@ -30,7 +30,7 @@ class CreateTaskController extends Controller
      */
     public function store(CreateTaskRequest $request): RedirectResponse
     {
-        $task = $this->createTaskAction->handle($request->validated());
+        $task = $this->createTaskAction->execute($request->validated());
 
         return redirect()
             ->route('tasks.show', $task)

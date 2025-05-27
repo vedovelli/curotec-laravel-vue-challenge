@@ -105,12 +105,37 @@ it('handles task with due date', function (): void {
         ->and($task->due_date->format('Y-m-d'))->toBe($dueDate);
 });
 
-it('is final and readonly class', function (): void {
+it('extends BaseAction class', function (): void {
     // Assert
     $reflection = new ReflectionClass(CreateTaskAction::class);
     
-    expect($reflection->isFinal())->toBeTrue()
-        ->and($reflection->isReadOnly())->toBeTrue();
+    expect($reflection->getParentClass()->getName())->toBe('App\Actions\BaseAction');
+});
+
+it('validates input correctly', function (): void {
+    // Test null input validation
+    expect(fn() => $this->action->handle(null))
+        ->toThrow(InvalidArgumentException::class, 'Task data cannot be null');
+    
+    // Test non-array input validation
+    expect(fn() => $this->action->handle('invalid'))
+        ->toThrow(InvalidArgumentException::class, 'Task data must be an array');
+});
+
+it('works with execute method for logging', function (): void {
+    // Arrange
+    $taskData = [
+        'title' => 'Execute Method Task',
+        'status' => 'pending',
+    ];
+
+    // Act
+    $task = $this->action->execute($taskData);
+
+    // Assert
+    expect($task)->toBeInstanceOf(Task::class)
+        ->and($task->title)->toBe('Execute Method Task')
+        ->and($task->exists)->toBeTrue();
 });
 
 it('accepts task model in constructor', function (): void {

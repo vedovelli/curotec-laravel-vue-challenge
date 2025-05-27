@@ -25,7 +25,10 @@ it('updates existing task successfully', function (): void {
     ];
 
     // Act
-    $result = $this->action->handle($task->id, $updateData);
+    $result = $this->action->handle([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
 
     // Assert
     expect($result)->toBeInstanceOf(Task::class)
@@ -56,7 +59,10 @@ it('updates partial task data', function (): void {
     ];
 
     // Act
-    $result = $this->action->handle($task->id, $updateData);
+    $result = $this->action->handle([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
 
     // Assert
     expect($result->title)->toBe('Updated Title Only')
@@ -72,8 +78,10 @@ it('throws exception for non-existent task', function (): void {
     ];
 
     // Act & Assert
-    expect(fn() => $this->action->handle($nonExistentTaskId, $updateData))
-        ->toThrow(ModelNotFoundException::class);
+    expect(fn() => $this->action->handle([
+        'id' => $nonExistentTaskId,
+        'data' => $updateData
+    ]))->toThrow(ModelNotFoundException::class);
 });
 
 it('returns fresh model instance', function (): void {
@@ -87,7 +95,10 @@ it('returns fresh model instance', function (): void {
     ];
 
     // Act
-    $result = $this->action->handle($task->id, $updateData);
+    $result = $this->action->handle([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
 
     // Assert
     expect($result)->not->toBe($task)
@@ -105,7 +116,10 @@ it('handles empty update data', function (): void {
     $updateData = [];
 
     // Act
-    $result = $this->action->handle($task->id, $updateData);
+    $result = $this->action->handle([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
 
     // Assert
     expect($result->title)->toBe('Original Title')
@@ -113,12 +127,45 @@ it('handles empty update data', function (): void {
         ->and($result->id)->toBe($task->id);
 });
 
-it('is final and readonly class', function (): void {
+it('extends BaseAction class', function (): void {
     // Assert
     $reflection = new ReflectionClass(UpdateTaskAction::class);
     
-    expect($reflection->isFinal())->toBeTrue()
-        ->and($reflection->isReadOnly())->toBeTrue();
+    expect($reflection->getParentClass()->getName())->toBe('App\Actions\BaseAction');
+});
+
+it('validates input correctly', function (): void {
+    // Test null input validation
+    expect(fn() => $this->action->handle(null))
+        ->toThrow(\InvalidArgumentException::class, 'Update data cannot be null');
+    
+    // Test non-array input validation
+    expect(fn() => $this->action->handle('invalid'))
+        ->toThrow(\InvalidArgumentException::class, 'Update data must be an array');
+    
+    // Test missing required keys
+    expect(fn() => $this->action->handle(['id' => 1]))
+        ->toThrow(\InvalidArgumentException::class, 'Update data must contain id and data keys');
+    
+    expect(fn() => $this->action->handle(['data' => []]))
+        ->toThrow(\InvalidArgumentException::class, 'Update data must contain id and data keys');
+});
+
+it('works with execute method for logging', function (): void {
+    // Arrange
+    $task = Task::factory()->create(['title' => 'Original Title']);
+    $updateData = ['title' => 'Execute Method Updated Title'];
+
+    // Act
+    $result = $this->action->execute([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
+
+    // Assert
+    expect($result)->toBeInstanceOf(Task::class)
+        ->and($result->title)->toBe('Execute Method Updated Title')
+        ->and($result->id)->toBe($task->id);
 });
 
 it('accepts task model in constructor', function (): void {
@@ -142,7 +189,10 @@ it('can be resolved from service container with dependency injection', function 
     
     // Verify it works with dependency injection
     $updateData = ['title' => 'Container Updated Title'];
-    $updatedTask = $action->handle($task->id, $updateData);
+    $updatedTask = $action->handle([
+        'id' => $task->id,
+        'data' => $updateData
+    ]);
     
     expect($updatedTask)->toBeInstanceOf(Task::class)
         ->and($updatedTask->title)->toBe('Container Updated Title')

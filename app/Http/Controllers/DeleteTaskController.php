@@ -19,7 +19,7 @@ class DeleteTaskController extends Controller
      */
     public function __invoke(Task $task): RedirectResponse
     {
-        $this->deleteTaskAction->handle($task->id);
+        $this->deleteTaskAction->execute($task->id);
 
         return redirect()
             ->route('dashboard')

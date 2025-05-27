@@ -24,7 +24,7 @@ it('displays task edit form', function (): void {
             ->where('task.title', $this->task->title)
             ->where('task.description', $this->task->description)
             ->where('task.status', $this->task->status)
-            ->where('task.due_date', $this->task->due_date)
+            ->where('task.due_date', $this->task->due_date?->toISOString())
         );
 });
 

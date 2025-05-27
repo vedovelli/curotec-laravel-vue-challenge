@@ -6,7 +6,7 @@ namespace App\Actions;
 
 use App\Models\Task;
 
-final readonly class CreateTaskAction
+class CreateTaskAction extends BaseAction
 {
     public function __construct(
         private Task $taskModel
@@ -17,8 +17,11 @@ final readonly class CreateTaskAction
      *
      * @param  array<string, mixed>  $data
      */
-    public function handle(array $data): Task
+    public function handle(mixed $input = null): Task
     {
-        return $this->taskModel->create($data);
+        $this->validateInputNotNull($input, 'Task data cannot be null');
+        $this->validateInputType($input, 'array', 'Task data must be an array');
+
+        return $this->taskModel->create($input);
     }
 }

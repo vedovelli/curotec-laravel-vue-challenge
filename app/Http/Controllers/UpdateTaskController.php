@@ -32,7 +32,10 @@ class UpdateTaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task): RedirectResponse
     {
-        $this->updateTaskAction->handle($task->id, $request->validated());
+        $this->updateTaskAction->execute([
+            'id' => $task->id,
+            'data' => $request->validated()
+        ]);
 
         return redirect()
             ->route('tasks.show', $task)

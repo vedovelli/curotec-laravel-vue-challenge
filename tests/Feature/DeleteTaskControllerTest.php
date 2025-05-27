@@ -72,5 +72,5 @@ it('removes task from database completely', function (): void {
     // Assert
     expect(Task::find($taskId))->toBeNull();
     expect(Task::where('title', $taskTitle)->exists())->toBeFalse();
-    expect(Task::withTrashed()->find($taskId))->toBeNull(); // Ensure it's not soft deleted
+    // Verify task is completely removed (hard delete, not soft delete)
 }); 

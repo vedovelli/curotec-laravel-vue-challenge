@@ -33,7 +33,7 @@ class DashboardController extends Controller
         $tasks = $this->task->latest()->paginate(10);
         
         // Get task statistics
-        $stats = $this->getTaskStatsAction->handle();
+        $stats = $this->getTaskStatsAction->execute();
 
         return Inertia::render('Dashboard', [
             'tasks' => TaskResource::collection($tasks),
