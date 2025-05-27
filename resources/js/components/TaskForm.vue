@@ -19,7 +19,6 @@
               v-model="localForm.title"
               type="text"
               name="title"
-              required
               placeholder="Enter task title"
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               :class="{
@@ -58,7 +57,6 @@
               id="status"
               v-model="localForm.status"
               name="status"
-              required
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               :class="{
                 'border-red-300 focus:border-red-500 focus:ring-red-500': props.form.errors.status,
@@ -179,9 +177,9 @@
             <button
               type="submit"
               :disabled="props.form.processing"
-              class="rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex w-36 items-center rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span v-if="props.form.processing" class="mr-2">
+              <div v-if="props.form.processing" class="mr-2 flex-nowrap">
                 <svg
                   class="mr-3 -ml-1 h-4 w-4 animate-spin text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +200,8 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-              </span>
+              </div>
+              <div v-else>&nbsp;</div>
               {{ props.form.processing ? processingText : submitText }}
             </button>
           </div>

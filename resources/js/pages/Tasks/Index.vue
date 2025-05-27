@@ -2,7 +2,7 @@
 import TaskList from '@/components/TaskList.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { PaginatedTasks, TaskStats, TaskStatus } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 interface Props {
   tasks: PaginatedTasks;
@@ -24,11 +24,12 @@ const props = defineProps<Props>();
           <p class="mt-1 text-sm text-gray-600">{{ props.taskStats.total_tasks }} total tasks</p>
         </div>
         <div class="flex items-center space-x-4">
-          <button
+          <Link
+            :href="route('tasks.create')"
             class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             Add Task
-          </button>
+          </Link>
         </div>
       </div>
       <TaskList
