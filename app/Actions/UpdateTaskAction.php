@@ -7,6 +7,9 @@ namespace App\Actions;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @extends BaseAction<array{id: int, data: array<string, mixed>}, Task>
+ */
 class UpdateTaskAction extends BaseAction
 {
     public function __construct(
@@ -16,7 +19,7 @@ class UpdateTaskAction extends BaseAction
     /**
      * Update an existing task with the provided data.
      *
-     * @param  mixed  $input Array containing 'id' and 'data' keys
+     * @param  array{id: int, data: array<string, mixed>}  $input Array containing 'id' and 'data' keys
      *
      * @throws ModelNotFoundException
      */

@@ -29,6 +29,7 @@ use Carbon\Carbon;
  */
 final class Task extends Model
 {
+    /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
     // Status constants for validation and consistency
@@ -43,7 +44,7 @@ final class Task extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'title',
@@ -72,6 +73,9 @@ final class Task extends Model
 
     /**
      * Scope a query to only include pending tasks.
+     *
+     * @param Builder<Task> $query
+     * @return Builder<Task>
      */
     public function scopePending(Builder $query): Builder
     {
@@ -80,6 +84,9 @@ final class Task extends Model
 
     /**
      * Scope a query to only include completed tasks.
+     *
+     * @param Builder<Task> $query
+     * @return Builder<Task>
      */
     public function scopeCompleted(Builder $query): Builder
     {
@@ -88,6 +95,9 @@ final class Task extends Model
 
     /**
      * Scope a query to only include overdue tasks.
+     *
+     * @param Builder<Task> $query
+     * @return Builder<Task>
      */
     public function scopeOverdue(Builder $query): Builder
     {
@@ -100,6 +110,9 @@ final class Task extends Model
      * Scope a query to only include tasks due today.
      * 
      * Note: Ready for future dashboard features (e.g., "Due Today" widget)
+     *
+     * @param Builder<Task> $query
+     * @return Builder<Task>
      */
     public function scopeDueToday(Builder $query): Builder
     {
@@ -110,6 +123,9 @@ final class Task extends Model
      * Scope a query to only include tasks due within the next X days.
      * 
      * Note: Ready for future dashboard features (e.g., "Due This Week" widget)
+     *
+     * @param Builder<Task> $query
+     * @return Builder<Task>
      */
     public function scopeDueWithin(Builder $query, int $days): Builder
     {
@@ -169,16 +185,12 @@ final class Task extends Model
     // RELATIONSHIPS
     // ==========================================
 
-    /**
-     * Get the user that owns the task.
-     * 
-     * Note: This relationship is prepared for future implementation
-     * when user association is added to the tasks table.
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    // Note: User relationship removed as no user_id column exists in tasks table.
+    // When user association is needed, add user_id column and restore this relationship:
+    // public function user(): BelongsTo<User, Task>
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
 
     // ==========================================
     // ACCESSORS

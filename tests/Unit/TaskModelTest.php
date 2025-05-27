@@ -343,13 +343,14 @@ test('nullable due date casting', function () {
 // MODEL RELATIONSHIPS TESTS
 // ==========================================
 
-test('user relationship definition', function () {
+test('user relationship removed', function () {
     $task = Task::factory()->make();
-    $relationship = $task->user();
-
-    expect($relationship)->toBeInstanceOf(BelongsTo::class)
-        ->and($relationship->getForeignKeyName())->toBe('user_id')
-        ->and($relationship->getOwnerKeyName())->toBe('id');
+    
+    // Verify that user relationship method doesn't exist
+    expect(method_exists($task, 'user'))->toBeFalse();
+    
+    // Note: User relationship was removed as no user_id column exists in tasks table.
+    // When user association is needed, add user_id column and restore the relationship.
 });
 
 // ==========================================

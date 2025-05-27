@@ -6,6 +6,9 @@ namespace App\Actions;
 
 use App\Models\Task;
 
+/**
+ * @extends BaseAction<null, array<string, int|float>>
+ */
 class GetTaskStatsAction extends BaseAction
 {
     public function __construct(
@@ -15,7 +18,8 @@ class GetTaskStatsAction extends BaseAction
     /**
      * Get task statistics.
      *
-     * @param  mixed  $input Not used for this action
+     * @param  null  $input Not used for this action
+     * @return array<string, int|float>
      */
     public function handle(mixed $input = null): array
     {

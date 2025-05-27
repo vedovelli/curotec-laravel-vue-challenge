@@ -8,6 +8,9 @@ use App\Models\Task;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @extends BaseAction<int, bool>
+ */
 class DeleteTaskAction extends BaseAction
 {
     public function __construct(
@@ -17,7 +20,7 @@ class DeleteTaskAction extends BaseAction
     /**
      * Delete a task by ID.
      *
-     * @param  mixed  $input Task ID to delete
+     * @param  int  $input Task ID to delete
      */
     public function handle(mixed $input = null): bool
     {

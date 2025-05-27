@@ -20,6 +20,10 @@ use Throwable;
  * - Immutability: Actions should be read-only (no property mutations)
  * - Type safety: Proper type declarations for all methods
  * - Error handling: Consistent error handling across all actions
+ * 
+ * @template TInput
+ * @template TOutput
+ * @implements ActionInterface<TInput, TOutput>
  */
 abstract class BaseAction implements ActionInterface
 {
@@ -29,8 +33,8 @@ abstract class BaseAction implements ActionInterface
      * This method must be implemented by concrete action classes.
      * It should contain the main business logic of the action.
      * 
-     * @param mixed $input The input data for the action
-     * @return mixed The result of the action execution
+     * @param TInput $input The input data for the action
+     * @return TOutput The result of the action execution
      */
     abstract public function handle(mixed $input = null): mixed;
 
@@ -40,8 +44,8 @@ abstract class BaseAction implements ActionInterface
      * This method provides a wrapper around the handle method with
      * consistent error handling and logging capabilities.
      * 
-     * @param mixed $input The input data for the action
-     * @return mixed The result of the action execution
+     * @param TInput $input The input data for the action
+     * @return TOutput The result of the action execution
      * @throws Throwable Re-throws any exceptions after logging
      */
     public function execute(mixed $input = null): mixed

@@ -22,8 +22,8 @@ interface ActionInterface
      * This method should contain the main business logic of the action.
      * It should be the only public method in action classes.
      * 
-     * @param mixed $input The input data for the action
-     * @return mixed The result of the action execution
+     * @param TInput $input The input data for the action
+     * @return TOutput The result of the action execution
      */
     public function handle(mixed $input = null): mixed;
 } 

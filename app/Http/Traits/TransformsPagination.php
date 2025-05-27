@@ -20,15 +20,20 @@ trait TransformsPagination
      * Creates a standardized pagination structure with data, meta, and links
      * that can be consumed by frontend components consistently.
      *
-     * @param LengthAwarePaginator $paginator The Laravel paginator instance
-     * @return array The transformed pagination structure
+     * @param LengthAwarePaginator<int, mixed> $paginator The Laravel paginator instance
+     * @return array{data: array<mixed>, meta: array<string, int|null>, links: array<string, mixed>} The transformed pagination structure
      */
     protected function transformPagination(LengthAwarePaginator $paginator): array
     {
         return [
             'data' => $paginator->items(),
             'meta' => $this->transformPaginationMeta($paginator),
-            'links' => $paginator->linkCollection()->toArray(),
+            'links' => [
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
+                'prev' => $paginator->previousPageUrl(),
+                'next' => $paginator->nextPageUrl(),
+            ],
         ];
     }
 
@@ -37,8 +42,8 @@ trait TransformsPagination
      * 
      * Extracts and formats the pagination metadata in a consistent structure.
      *
-     * @param LengthAwarePaginator $paginator The Laravel paginator instance
-     * @return array The pagination metadata
+     * @param LengthAwarePaginator<int, mixed> $paginator The Laravel paginator instance
+     * @return array<string, int|null> The pagination metadata
      */
     protected function transformPaginationMeta(LengthAwarePaginator $paginator): array
     {
@@ -58,8 +63,8 @@ trait TransformsPagination
      * Includes extra metadata like has_more_pages that might be useful
      * for dashboard or overview components.
      *
-     * @param LengthAwarePaginator $paginator The Laravel paginator instance
-     * @return array The enhanced pagination structure
+     * @param LengthAwarePaginator<int, mixed> $paginator The Laravel paginator instance
+     * @return array<string, int|bool|array<string, mixed>|null> The enhanced pagination structure
      */
     protected function transformPaginationWithExtras(LengthAwarePaginator $paginator): array
     {
@@ -71,7 +76,12 @@ trait TransformsPagination
             'from' => $paginator->firstItem(),
             'to' => $paginator->lastItem(),
             'has_more_pages' => $paginator->hasMorePages(),
-            'links' => $paginator->linkCollection()->toArray(),
+            'links' => [
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
+                'prev' => $paginator->previousPageUrl(),
+                'next' => $paginator->nextPageUrl(),
+            ],
         ];
     }
 } 

@@ -6,6 +6,9 @@ namespace App\Actions;
 
 use App\Models\Task;
 
+/**
+ * @extends BaseAction<array<string, mixed>, Task>
+ */
 class CreateTaskAction extends BaseAction
 {
     public function __construct(
@@ -15,7 +18,7 @@ class CreateTaskAction extends BaseAction
     /**
      * Create a new task with the provided data.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $input
      */
     public function handle(mixed $input = null): Task
     {
