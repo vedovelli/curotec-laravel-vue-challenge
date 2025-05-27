@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 import type { Task, TaskStats } from '@/types';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Dashboard from '../Dashboard.vue';
 
