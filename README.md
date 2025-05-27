@@ -4,7 +4,7 @@ A modern full-stack task management application demonstrating proficiency in Lar
 
 ## 🚀 Project Overview
 
-**Tech Stack:** Laravel 12.0+ | Vue 3 | Inertia.js | Pinia | TailwindCSS | TypeScript  
+**Tech Stack:** Laravel 12.0+ | Vue 3 | Inertia.js | TailwindCSS | TypeScript  
 **Status:** ✅ Core Implementation Complete - Refactored & Optimized  
 **Test Coverage:** 149 tests passing with comprehensive coverage
 
@@ -449,7 +449,6 @@ resources/js/
 ├── composables/         # Vue composables
 ├── layouts/             # Page layouts
 ├── pages/               # Page components
-├── stores/              # Pinia stores
 ├── types/               # TypeScript definitions
 └── utils/               # Utility functions
 ```
@@ -468,21 +467,23 @@ resources/js/
    </script>
    ```
 
-2. **Pinia State Management**
+2. **Inertia.js State Management**
 
-   ```typescript
-   export const useTaskStore = defineStore('tasks', {
-     state: () => ({
-       tasks: [] as Task[],
-       isLoading: false,
-     }),
-     actions: {
-       async fetchTasks() {
-         this.isLoading = true;
-         // API call logic
-       },
-     },
-   });
+   ```vue
+   <script setup lang="ts">
+   import { router } from '@inertiajs/vue3';
+
+   // Props passed from Laravel controllers
+   defineProps<{
+     tasks: Task[];
+     filters: FilterOptions;
+   }>();
+
+   // Navigate with state
+   const handleFilter = (status: string) => {
+     router.get('/tasks', { status }, { preserveState: true });
+   };
+   </script>
    ```
 
 3. **Semantic Color System**
@@ -769,7 +770,6 @@ refactor(actions): implement BaseAction pattern
 - [Vue 3 Documentation](https://vuejs.org/guide/)
 - [Inertia.js Documentation](https://inertiajs.com/)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
-- [Pinia Documentation](https://pinia.vuejs.org/)
 
 ### Project-Specific Guides
 
