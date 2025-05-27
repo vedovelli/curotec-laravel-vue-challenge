@@ -98,6 +98,8 @@ final class Task extends Model
 
     /**
      * Scope a query to only include tasks due today.
+     * 
+     * Note: Ready for future dashboard features (e.g., "Due Today" widget)
      */
     public function scopeDueToday(Builder $query): Builder
     {
@@ -106,6 +108,8 @@ final class Task extends Model
 
     /**
      * Scope a query to only include tasks due within the next X days.
+     * 
+     * Note: Ready for future dashboard features (e.g., "Due This Week" widget)
      */
     public function scopeDueWithin(Builder $query, int $days): Builder
     {

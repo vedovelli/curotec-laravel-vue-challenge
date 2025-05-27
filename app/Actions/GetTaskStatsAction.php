@@ -20,8 +20,8 @@ class GetTaskStatsAction extends BaseAction
     public function handle(mixed $input = null): array
     {
         $totalTasks = $this->task->count();
-        $completedTasks = $this->task->where('status', Task::STATUS_COMPLETED)->count();
-        $pendingTasks = $this->task->where('status', Task::STATUS_PENDING)->count();
+        $completedTasks = $this->task->completed()->count();
+        $pendingTasks = $this->task->pending()->count();
         
         $completionPercentage = $totalTasks > 0 
             ? (float) round(($completedTasks / $totalTasks) * 100, 2) 

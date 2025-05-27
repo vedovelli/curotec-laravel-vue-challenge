@@ -26,10 +26,13 @@ class ListTasksController extends Controller
         // Build query with filtering
         $query = Task::query()->orderBy('created_at', 'desc');
 
-        // Apply status filter
-        if ($filter !== 'all') {
-            $query->where('status', $filter);
+        // Apply status filter using scopes
+        if ($filter === 'pending') {
+            $query->pending();
+        } elseif ($filter === 'completed') {
+            $query->completed();
         }
+        // 'all' filter requires no additional scope
 
         // Get paginated results
         $tasks = $query->paginate($perPage);
