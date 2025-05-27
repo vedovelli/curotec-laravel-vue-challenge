@@ -4,22 +4,14 @@
       <h2 class="text-foreground text-xl leading-tight font-semibold">Create New Task</h2>
     </template>
 
-    <div class="py-12">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="bg-background overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="text-foreground p-6">
-            <TaskForm
-              :form="form"
-              mode="create"
-              :cancel-route="route('dashboard')"
-              submit-text="Create Task"
-              processing-text="Creating..."
-              @submit="handleSubmit"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <TaskForm
+      :form="form"
+      mode="create"
+      :cancel-route="route('dashboard')"
+      submit-text="Create Task"
+      processing-text="Creating..."
+      @submit="handleSubmit"
+    />
   </AppLayout>
 </template>
 
@@ -32,7 +24,9 @@ interface TaskFormData {
   title: string;
   description: string;
   status: string;
+  priority: string;
   due_date: string;
+  assignee: string;
   [key: string]: string;
 }
 
@@ -40,20 +34,26 @@ const form = useForm<TaskFormData>({
   title: '',
   description: '',
   status: 'pending',
+  priority: 'medium',
   due_date: '',
+  assignee: '',
 });
 
 const handleSubmit = (data: {
   title: string;
   description: string;
   status: string;
+  priority: string;
   due_date: string;
+  assignee: string;
 }): void => {
   // Update form with the data from TaskForm component
   form.title = data.title;
   form.description = data.description;
   form.status = data.status;
+  form.priority = data.priority;
   form.due_date = data.due_date;
+  form.assignee = data.assignee;
 
   form.post(route('tasks.store'), {
     onSuccess: () => {

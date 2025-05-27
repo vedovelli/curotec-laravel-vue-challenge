@@ -17,7 +17,7 @@ const props = defineProps<Props>();
   <Head title="Tasks" />
 
   <AppLayout title="Tasks">
-    <div class="min-h-full bg-slate-100 p-8">
+    <div class="min-h-full bg-gray-50 p-8">
       <div class="mb-4 flex items-center justify-between border-b border-black/15 pb-3">
         <div class="flex gap-2">
           <h2 class="text-xl leading-tight font-semibold text-gray-800">Tasks</h2>

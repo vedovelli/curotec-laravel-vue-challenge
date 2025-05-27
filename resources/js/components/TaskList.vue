@@ -67,18 +67,6 @@ const handlePaginationClick = (url: string | null) => {
   });
 };
 
-// Handle filter reset
-const handleResetFilters = () => {
-  const currentUrl = new URL(window.location.href);
-  const newUrl = currentUrl.pathname;
-
-  router.visit(newUrl, {
-    preserveState: true,
-    preserveScroll: true,
-    only: ['tasks'],
-  });
-};
-
 // Pagination link classes
 const getPaginationLinkClasses = (link: { url: string | null; active: boolean }) => {
   const baseClasses =

@@ -79,8 +79,8 @@ const assigneeName = 'Fabio Vedovelli';
 
       <button
         class="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-gray-600"
-        @click.prevent.stop
         aria-label="Task options"
+        @click.prevent.stop
       >
         <MoreVertical class="h-4 w-4" />
       </button>
