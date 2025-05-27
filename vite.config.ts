@@ -1,9 +1,9 @@
+import { defineConfig } from 'vitest/config';
+import laravel from 'laravel-vite-plugin';
+import path from 'path';
+import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
-import laravel from 'laravel-vite-plugin';
-import { resolve } from 'node:path';
-import path from 'path';
-import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
@@ -29,5 +29,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './resources/js'),
       'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
     },
+  },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    include: ['resources/js/**/*.{test,spec}.{js,ts,vue}'],
+    setupFiles: ['./tests/frontend/setup.ts'],
   },
 });

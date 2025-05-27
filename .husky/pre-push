@@ -34,7 +34,7 @@ echo "🔍 Running all quality checks before push..."
 echo ""
 
 # 1. Run PHPStan static analysis
-print_status "1/6 Running PHPStan static analysis..."
+print_status "1/7 Running PHPStan static analysis..."
 if composer quality; then
     print_success "PHPStan analysis passed"
 else
@@ -43,7 +43,7 @@ else
 fi
 
 # 2. Run PHP tests
-print_status "2/6 Running PHP tests..."
+print_status "2/7 Running PHP tests..."
 if php artisan test; then
     print_success "PHP tests passed"
 else
@@ -52,7 +52,7 @@ else
 fi
 
 # 3. Check ESLint
-print_status "3/6 Running ESLint check..."
+print_status "3/7 Running ESLint check..."
 if npm run lint:check; then
     print_success "ESLint check passed"
 else
@@ -61,8 +61,18 @@ else
     exit 1
 fi
 
-# 4. Check Prettier formatting
-print_status "4/6 Checking Prettier formatting..."
+# 4. Run frontend tests
+print_status "4/7 Running frontend tests..."
+if npm run test:run; then
+    print_success "Frontend tests passed"
+else
+    print_error "Frontend tests failed"
+    print_warning "Check test output above for details"
+    exit 1
+fi
+
+# 5. Check Prettier formatting
+print_status "5/7 Checking Prettier formatting..."
 if npm run format:check; then
     print_success "Prettier formatting check passed"
 else
@@ -71,8 +81,8 @@ else
     exit 1
 fi
 
-# 5. Build frontend to check for errors
-print_status "5/6 Building frontend to check for errors..."
+# 6. Build frontend to check for errors
+print_status "6/7 Building frontend to check for errors..."
 if npm run build; then
     print_success "Frontend build successful"
 else
@@ -80,8 +90,8 @@ else
     exit 1
 fi
 
-# 6. Additional check: ensure no console.log statements in production code
-print_status "6/6 Checking for console.log statements..."
+# 7. Additional check: ensure no console.log statements in production code
+print_status "7/7 Checking for console.log statements..."
 if grep -r "console\.log" resources/js --exclude-dir=node_modules --include="*.vue" --include="*.ts" --include="*.js" > /dev/null 2>&1; then
     print_warning "Found console.log statements in code:"
     grep -r "console\.log" resources/js --exclude-dir=node_modules --include="*.vue" --include="*.ts" --include="*.js" || true

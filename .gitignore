@@ -50,3 +50,4 @@ tasks.json
 .cursor
 README-task-master.md
 .repomix-output.txt
+coverage/

@@ -248,6 +248,108 @@ class Task extends Model
 - **Create component tests for reusable form components**
 - **Test emit events and prop validation**
 
+## Frontend Testing
+
+This project uses **Vitest** and **Vue Testing Library** for comprehensive frontend component testing.
+
+### Test Configuration
+
+- **Vitest** - Fast unit test runner with native TypeScript support
+- **Vue Testing Library** - Testing utilities for Vue components
+- **Happy DOM** - Lightweight DOM implementation for testing
+- **@testing-library/jest-dom** - Custom Jest matchers for DOM assertions
+
+### Test Structure
+
+```
+resources/js/components/__tests__/
+├── TaskCard.test.ts        # Task card component tests
+├── TaskForm.test.ts        # Task form component tests
+└── TaskList.test.ts        # Task list component tests
+
+tests/frontend/
+└── setup.ts               # Global test configuration
+```
+
+### Running Tests
+
+```bash
+# Run tests in watch mode (development)
+npm run test
+
+# Run tests once (used in pre-push hook)
+npm run test:run
+
+# Run tests with UI interface
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Coverage
+
+Current frontend tests cover **35 test cases** across 3 components:
+
+- **TaskCard Component** (11 tests)
+
+  - Rendering task information (title, description, status)
+  - Status and priority badge styling
+  - Due date handling and formatting
+  - Accessibility attributes and ARIA labels
+  - Hover effects and interactive states
+
+- **TaskForm Component** (11 tests)
+
+  - Form field rendering and validation
+  - Create/edit mode switching
+  - Form submission and processing states
+  - Required field indicators
+  - Error message display
+
+- **TaskList Component** (13 tests)
+  - Task filtering and empty states
+  - Grid layout and responsive design
+  - Pagination functionality
+  - Accessibility attributes
+  - Screen reader support
+
+### Testing Best Practices
+
+```typescript
+// ✅ DO: Use descriptive test names
+it('should render task title and description', () => {
+  // Test implementation
+});
+
+// ✅ DO: Use proper TypeScript types
+const mockRoute = (name: string, params?: string | number) => `/tasks/${params}`;
+
+// ✅ DO: Test accessibility attributes
+expect(link).toHaveAttribute('aria-label', 'View task: Accessible Task');
+
+// ✅ DO: Mock external dependencies
+global: {
+  mocks: {
+    route: mockRoute,
+  },
+  stubs: {
+    Link: {
+      template: '<a :href="href" v-bind="$attrs"><slot /></a>',
+      props: ['href'],
+    },
+  },
+}
+
+// ✅ DO: Test both positive and negative cases
+expect(screen.getByText('Task Title')).toBeInTheDocument();
+expect(screen.queryByText('Hidden Content')).not.toBeInTheDocument();
+```
+
+### Integration with Quality Checks
+
+Frontend tests are automatically run as part of the pre-push hook (step 4/7) and included in the `quality:frontend` script. Tests must pass before code can be pushed to the repository.
+
 ## PHPStan Static Analysis
 
 PHPStan is configured to run at level 6, providing comprehensive static analysis of the PHP codebase. It helps catch:
@@ -314,6 +416,7 @@ This project uses [Husky git hooks](https://typicode.github.io/husky/) to automa
 - PHPStan static analysis (`composer quality`)
 - PHP tests (`php artisan test`)
 - ESLint check (`npm run lint:check`)
+- Frontend tests (`npm run test:run`)
 - Prettier formatting check (`npm run format:check`)
 - Frontend build (`npm run build`)
 - Console.log detection (warns but doesn't block)
@@ -326,7 +429,7 @@ npm run quality:all
 
 # Run specific checks
 npm run quality:backend    # PHPStan + tests
-npm run quality:frontend   # ESLint + Prettier + build
+npm run quality:frontend   # ESLint + Prettier + frontend tests + build
 
 # Auto-fix issues
 npm run fix:frontend       # ESLint + Prettier auto-fix
@@ -340,6 +443,7 @@ The following checks are **automatically enforced** by git hooks, but can also b
 - [ ] PHPStan analysis passes (`composer quality`)
 - [ ] Frontend builds without errors (`npm run build`)
 - [ ] ESLint passes (`npm run lint:check`)
+- [ ] Frontend tests pass (`npm run test:run`)
 - [ ] Prettier formatting is correct (`npm run format:check`)
 - [ ] No console errors in browser dev tools
 - [ ] Semantic colors are used consistently
