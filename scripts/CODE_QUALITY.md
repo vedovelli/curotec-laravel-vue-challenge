@@ -1,6 +1,6 @@
 # Code Quality Setup
 
-This project uses ESLint and Prettier to maintain consistent code quality and formatting.
+This project uses ESLint, Prettier, and PHPStan to maintain consistent code quality and formatting.
 
 ## Available Scripts
 
@@ -14,11 +14,17 @@ This project uses ESLint and Prettier to maintain consistent code quality and fo
 - `npm run format` - Format all frontend code using Prettier
 - `npm run format:check` - Check if code is properly formatted
 
+### Static Analysis
+
+- `composer quality` - Run PHPStan static analysis on the backend code
+- `vendor/bin/phpstan analyse` - Run PHPStan directly with default configuration
+
 ## Configuration Files
 
 - `eslint.config.js` - ESLint configuration using the flat config format
 - `.prettierrc` - Prettier configuration for consistent formatting
 - `.editorconfig` - Editor configuration for consistent settings across IDEs
+- `phpstan.neon` - PHPStan configuration for static analysis (level 6)
 
 ## Project Structure
 
@@ -230,6 +236,9 @@ class Task extends Model
 - **Extract common controller logic into traits**
 - **Use Eloquent scopes for readable queries**
 - **Maintain consistent method signatures across similar actions**
+- **Write proper PHPDoc comments for type safety**
+- **Use strict typing and proper return type declarations**
+- **Follow PHPStan level 6 standards for static analysis**
 
 ### Testing
 
@@ -239,11 +248,63 @@ class Task extends Model
 - **Create component tests for reusable form components**
 - **Test emit events and prop validation**
 
+## PHPStan Static Analysis
+
+PHPStan is configured to run at level 6, providing comprehensive static analysis of the PHP codebase. It helps catch:
+
+- Type errors and inconsistencies
+- Undefined variables and methods
+- Dead code and unreachable statements
+- Missing return types and PHPDoc annotations
+- Laravel-specific issues through Larastan integration
+
+### PHPStan Configuration
+
+The `phpstan.neon` file includes:
+
+- **Larastan extension** - Laravel-specific rules and understanding
+- **Carbon extension** - Enhanced Carbon date library support
+- **Analysis level 6** - Strict type checking without being overly restrictive
+- **App directory scanning** - Focuses on application code
+
+### Common PHPStan Issues and Solutions
+
+```php
+// ❌ DON'T: Missing return type
+public function handle($data)
+{
+    return Task::create($data);
+}
+
+// ✅ DO: Proper return type declaration
+public function handle(array $data): Task
+{
+    return Task::create($data);
+}
+
+// ❌ DON'T: Missing PHPDoc for complex types
+public function transform($resource)
+{
+    return new TaskResource($resource);
+}
+
+// ✅ DO: Proper PHPDoc with generic types
+/**
+ * @param Task $resource
+ * @return TaskResource
+ */
+public function transform(Task $resource): TaskResource
+{
+    return new TaskResource($resource);
+}
+```
+
 ## Validation Checklist
 
 Before committing code, ensure:
 
 - [ ] All tests pass (`php artisan test`)
+- [ ] PHPStan analysis passes (`composer quality`)
 - [ ] Frontend builds without errors (`npm run build`)
 - [ ] ESLint passes (`npm run lint:check`)
 - [ ] Prettier formatting is correct (`npm run format:check`)
@@ -252,3 +313,4 @@ Before committing code, ensure:
 - [ ] Actions extend BaseAction
 - [ ] Controllers use single-action pattern
 - [ ] Form components follow reusable pattern
+- [ ] Proper return types and PHPDoc comments are present
