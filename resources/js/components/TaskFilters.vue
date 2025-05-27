@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import type { TaskStatus } from '@/types';
+import type { TaskStats, TaskStatus } from '@/types';
 import { router } from '@inertiajs/vue3';
-import { CheckCircle2, Clock, Filter, List } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 interface Props {
   currentFilter?: TaskStatus;
+  taskStats: TaskStats;
   class?: string;
 }
 
@@ -18,27 +18,24 @@ const props = withDefaults(defineProps<Props>(), {
 // Reactive state for the current filter
 const activeFilter = ref<TaskStatus>(props.currentFilter);
 
-// Filter options configuration
-const filterOptions = [
+// Filter options configuration with counts
+const filterOptions = computed(() => [
   {
     value: 'all' as TaskStatus,
     label: 'All Tasks',
-    icon: List,
-    description: 'Show all tasks',
+    count: props.taskStats.total_tasks,
   },
   {
     value: 'pending' as TaskStatus,
     label: 'Pending',
-    icon: Clock,
-    description: 'Show pending tasks',
+    count: props.taskStats.pending_tasks,
   },
   {
     value: 'completed' as TaskStatus,
     label: 'Completed',
-    icon: CheckCircle2,
-    description: 'Show completed tasks',
+    count: props.taskStats.completed_tasks,
   },
-];
+]);
 
 // Read initial filter state from URL on component mount
 onMounted(() => {
@@ -83,12 +80,10 @@ const getButtonClasses = (filterValue: TaskStatus) => {
   const isActive = activeFilter.value === filterValue;
 
   return cn(
-    'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-200',
-    'border-border border',
-    'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+    'rounded-md px-3 py-2 text-sm font-medium transition-all duration-200',
     isActive
-      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
-      : 'bg-background text-foreground hover:border-border/80 hover:bg-muted'
+      ? 'bg-white text-gray-900 shadow-sm'
+      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
   );
 };
 
@@ -101,22 +96,15 @@ const handleKeydown = (event: KeyboardEvent, filterValue: TaskStatus) => {
 };
 
 // Get count text for accessibility
-const getFilterAriaLabel = (option: (typeof filterOptions)[0]) => {
+const getFilterAriaLabel = (option: (typeof filterOptions.value)[0]) => {
   const isActive = activeFilter.value === option.value;
-  return `${option.label}. ${option.description}. ${isActive ? 'Currently selected' : 'Click to filter'}`;
+  return `${option.label}. ${option.count} tasks. ${isActive ? 'Currently selected' : 'Click to filter'}`;
 };
 </script>
 
 <template>
-  <div :class="cn('flex flex-col gap-3 sm:flex-row', props.class)">
-    <!-- Filter Label -->
-    <div class="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-      <Filter class="h-4 w-4" />
-      <span>Filter by status:</span>
-    </div>
-
-    <!-- Filter Buttons -->
-    <div class="flex flex-wrap gap-2" role="group" aria-label="Task status filters">
+  <div :class="cn('mb-6', props.class)">
+    <div class="flex w-fit items-center space-x-1 rounded-lg bg-gray-100 p-1">
       <button
         v-for="option in filterOptions"
         :key="option.value"
@@ -127,8 +115,10 @@ const getFilterAriaLabel = (option: (typeof filterOptions)[0]) => {
         @click="handleFilterChange(option.value)"
         @keydown="handleKeydown($event, option.value)"
       >
-        <component :is="option.icon" class="h-4 w-4" />
-        <span>{{ option.label }}</span>
+        {{ option.label }}
+        <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700">
+          {{ option.count }}
+        </span>
       </button>
     </div>
 

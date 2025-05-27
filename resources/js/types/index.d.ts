@@ -53,6 +53,13 @@ export interface Task {
   priority_level: string;
 }
 
+export interface TaskStats {
+  total_tasks: number;
+  completed_tasks: number;
+  pending_tasks: number;
+  completion_percentage: number;
+}
+
 export type TaskStatus = 'all' | 'pending' | 'completed';
 
 export type BreadcrumbItemType = BreadcrumbItem;

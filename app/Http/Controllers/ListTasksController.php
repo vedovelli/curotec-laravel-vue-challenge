@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\GetTaskStatsAction;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,6 +12,9 @@ use Inertia\Response;
 
 class ListTasksController extends Controller
 {
+    public function __construct(
+        private readonly GetTaskStatsAction $getTaskStatsAction
+    ) {}
 
     public function __invoke(Request $request): Response
     {
@@ -41,9 +45,13 @@ class ListTasksController extends Controller
         // Append query parameters to pagination links
         $tasks->appends($request->query());
 
+        // Get task statistics
+        $stats = $this->getTaskStatsAction->execute();
+
         return Inertia::render('Tasks/Index', [
             'tasks' => $tasks,
             'currentFilter' => $filter,
+            'taskStats' => $stats,
         ]);
     }
 } 

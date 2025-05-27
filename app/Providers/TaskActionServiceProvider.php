@@ -9,6 +9,7 @@ use App\Actions\DeleteTaskAction;
 use App\Actions\GetTaskStatsAction;
 use App\Actions\UpdateTaskAction;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ListTasksController;
 use App\Models\Task;
 use Illuminate\Support\ServiceProvider;
 
@@ -43,6 +44,13 @@ final class TaskActionServiceProvider extends ServiceProvider
         $this->app->bind(DashboardController::class, function ($app) {
             return new DashboardController(
                 $app->make(Task::class),
+                $app->make(GetTaskStatsAction::class)
+            );
+        });
+
+        // Register ListTasksController with dependencies
+        $this->app->bind(ListTasksController::class, function ($app) {
+            return new ListTasksController(
                 $app->make(GetTaskStatsAction::class)
             );
         });

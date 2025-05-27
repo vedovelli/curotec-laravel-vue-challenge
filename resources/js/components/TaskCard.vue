@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
 import type { Task } from '@/types';
-import { formatTaskDate, getRelativeTimeText, isOverdue } from '@/utils/date';
+import { formatTaskDate } from '@/utils/date';
 import { Link } from '@inertiajs/vue3';
-import { Calendar, CheckCircle2, Circle, Clock } from 'lucide-vue-next';
+import { Clock, MoreVertical } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -13,106 +13,115 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Computed properties for styling and display
-const statusBadgeClasses = computed(() => {
-  const baseClasses =
-    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors';
-
-  if (props.task.status === 'completed') {
-    return cn(baseClasses, 'bg-green-100 text-green-800');
-  }
-
-  if (props.task.is_overdue) {
-    return cn(baseClasses, 'bg-destructive/10 text-destructive');
-  }
-
-  return cn(baseClasses, 'bg-yellow-100 text-yellow-800');
+// Status colors mapping - updated to match prototype
+const statusColors = computed(() => {
+  const statusMap = {
+    pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    completed: 'bg-green-50 text-green-700 border-green-200',
+  };
+  return statusMap[props.task.status] || 'bg-gray-50 text-gray-700 border-gray-200';
 });
 
-const statusIcon = computed(() => {
-  return props.task.status === 'completed' ? CheckCircle2 : Circle;
+// Priority colors mapping - updated to match prototype
+const priorityColors = computed(() => {
+  const priority = props.task.priority_level?.toLowerCase() || 'medium';
+  const priorityMap = {
+    low: 'bg-green-50 text-green-700 border-green-200',
+    medium: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    high: 'bg-red-50 text-red-700 border-red-200',
+  };
+  return priorityMap[priority as keyof typeof priorityMap] || priorityMap.medium;
+});
+
+// Status labels mapping
+const statusLabels = computed(() => {
+  const statusMap = {
+    pending: 'Pending',
+    completed: 'Completed',
+  };
+  return statusMap[props.task.status] || 'Unknown';
 });
 
 const dueDateText = computed(() => {
   return formatTaskDate(props.task.due_date);
 });
 
-const relativeTimeText = computed(() => {
-  return getRelativeTimeText(props.task.due_date, props.task.is_completed);
+const createdDateText = computed(() => {
+  return formatTaskDate(props.task.created_at);
 });
 
-const isTaskOverdue = computed(() => {
-  return isOverdue(props.task.due_date, props.task.is_completed);
-});
-
-const cardClasses = computed(() => {
-  const baseClasses =
-    'group relative block bg-background border border-border rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
-
-  if (props.task.status === 'completed') {
-    return cn(baseClasses, 'opacity-75 hover:opacity-100');
-  }
-
-  return baseClasses;
-});
+// Assignee initials for Fabio Vedovelli
+const assigneeInitials = 'FV';
+const assigneeName = 'Fabio Vedovelli';
 </script>
 
 <template>
   <Link
     :href="route('tasks.show', task.id)"
-    :class="cn(cardClasses, props.class)"
+    :class="
+      cn(
+        'group block h-full cursor-pointer rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 hover:border-gray-300 hover:shadow-lg',
+        props.class
+      )
+    "
     :aria-label="`View task: ${task.title}`"
   >
-    <!-- Task Header -->
-    <div class="mb-3 flex items-start justify-between gap-3">
-      <div class="min-w-0 flex-1">
-        <h3
-          class="text-foreground group-hover:text-primary line-clamp-2 text-base font-semibold transition-colors sm:text-lg"
-        >
-          {{ task.title }}
-        </h3>
-      </div>
-
-      <!-- Status Badge -->
-      <div :class="statusBadgeClasses">
-        <component :is="statusIcon" class="h-3 w-3" />
-        <span>{{ task.status_text }}</span>
-      </div>
-    </div>
-
-    <!-- Task Description -->
-    <div v-if="task.description" class="mb-4">
-      <p class="text-muted-foreground line-clamp-3 text-sm">
-        {{ task.description }}
-      </p>
-    </div>
-
-    <!-- Task Footer -->
-    <div
-      class="text-muted-foreground flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between"
-    >
-      <!-- Due Date -->
-      <div v-if="task.due_date" class="flex items-center gap-1.5">
-        <Calendar class="h-3 w-3" />
-        <span>{{ dueDateText }}</span>
-        <span
-          v-if="relativeTimeText"
-          :class="cn('font-medium', isTaskOverdue ? 'text-destructive' : 'text-primary')"
-        >
-          ({{ relativeTimeText }})
+    <!-- Task Header with Status and Priority -->
+    <div class="mb-3 flex items-start justify-between">
+      <div class="flex items-center gap-2">
+        <span :class="cn('rounded-full border px-2 py-1 text-xs font-medium', statusColors)">
+          {{ statusLabels }}
+        </span>
+        <span :class="cn('rounded-full border px-2 py-1 text-xs font-medium', priorityColors)">
+          {{ task.priority_level }}
         </span>
       </div>
 
-      <!-- Created Date -->
-      <div class="flex items-center gap-1.5">
-        <Clock class="h-3 w-3" />
-        <span>Created {{ formatTaskDate(task.created_at) }}</span>
-      </div>
+      <button
+        class="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-gray-600"
+        @click.prevent.stop
+        aria-label="Task options"
+      >
+        <MoreVertical class="h-4 w-4" />
+      </button>
     </div>
 
-    <!-- Hover Indicator -->
-    <div
-      class="group-hover:border-primary/20 pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
-    />
+    <!-- Task Title -->
+    <h3
+      class="mb-2 line-clamp-2 font-semibold text-gray-900 transition-colors group-hover:text-blue-600"
+    >
+      {{ task.title }}
+    </h3>
+
+    <!-- Task Description -->
+    <p v-if="task.description" class="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-600">
+      {{ task.description }}
+    </p>
+
+    <!-- Task Footer -->
+    <div class="space-y-3">
+      <!-- Due Date -->
+      <div v-if="task.due_date" class="flex items-center text-sm text-gray-500">
+        <Clock class="mr-2 h-4 w-4" />
+        <span>{{ dueDateText }}</span>
+      </div>
+
+      <!-- Created Date and Assignee -->
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">Created {{ createdDateText }}</span>
+
+        <!-- Assignee Avatar -->
+        <div class="flex items-center">
+          <div
+            class="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500"
+            :title="assigneeName"
+          >
+            <span class="text-xs font-medium text-white">
+              {{ assigneeInitials }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </Link>
 </template>

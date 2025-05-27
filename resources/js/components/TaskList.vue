@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import type { PaginatedTasks, TaskStatus } from '@/types';
+import type { PaginatedTasks, TaskStats, TaskStatus } from '@/types';
 import { router } from '@inertiajs/vue3';
-import { AlertCircle, Loader2 } from 'lucide-vue-next';
+import { ClipboardList } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import TaskCard from './TaskCard.vue';
 import TaskFilters from './TaskFilters.vue';
-import { Skeleton } from './ui/skeleton';
 
 interface Props {
   tasks: PaginatedTasks;
+  taskStats: TaskStats;
   currentFilter?: TaskStatus;
   class?: string;
 }
@@ -97,13 +97,7 @@ const getPaginationLinkClasses = (link: { url: string | null; active: boolean })
 
 // Task grid classes
 const taskGridClasses = computed(() => {
-  return cn(
-    'grid gap-4 sm:gap-6',
-    'grid-cols-1',
-    'md:grid-cols-2',
-    'lg:grid-cols-3',
-    'xl:grid-cols-4'
-  );
+  return cn('grid gap-6', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4');
 });
 
 // Get previous and next links for mobile pagination
@@ -116,41 +110,10 @@ const nextLink = computed(() => props.tasks.links.find((link) => link.label.incl
 <template>
   <div :class="cn('space-y-6', props.class)">
     <!-- Task Filters -->
-    <TaskFilters :current-filter="currentFilter" />
-
-    <!-- Loading State -->
-    <div v-if="isLoading" class="space-y-4" aria-live="polite" aria-busy="true">
-      <div class="text-muted-foreground flex items-center gap-2 text-sm">
-        <Loader2 class="h-4 w-4 animate-spin" />
-        <span>Loading tasks...</span>
-      </div>
-
-      <!-- Skeleton Loading -->
-      <div :class="taskGridClasses">
-        <div v-for="i in 6" :key="i" class="space-y-3">
-          <Skeleton class="h-4 w-3/4" />
-          <Skeleton class="h-3 w-full" />
-          <Skeleton class="h-3 w-2/3" />
-          <div class="flex justify-between">
-            <Skeleton class="h-3 w-1/4" />
-            <Skeleton class="h-3 w-1/4" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <TaskFilters :current-filter="currentFilter" :task-stats="taskStats" />
 
     <!-- Task List Content -->
-    <div v-else>
-      <!-- Results Summary -->
-      <div class="mb-4 flex items-center justify-between">
-        <div class="text-muted-foreground text-sm" aria-live="polite">
-          {{ filterStatusText }}
-          <span v-if="hasResults && showingFrom && showingTo">
-            ({{ showingFrom }}-{{ showingTo }} of {{ totalTasks }})
-          </span>
-        </div>
-      </div>
-
+    <div>
       <!-- Task Grid -->
       <div v-if="hasResults">
         <ul :class="taskGridClasses" role="list" aria-label="Task list">
@@ -161,34 +124,25 @@ const nextLink = computed(() => props.tasks.links.find((link) => link.label.incl
       </div>
 
       <!-- Empty State -->
-      <div v-else class="py-12 text-center">
-        <div class="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
-          <AlertCircle class="text-muted-foreground h-6 w-6" />
+      <div v-else class="py-16 text-center">
+        <div
+          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
+        >
+          <ClipboardList class="h-8 w-8 text-gray-500" />
         </div>
-
-        <h3 class="text-foreground mt-4 text-lg font-medium">No tasks found</h3>
-
-        <p class="text-muted-foreground mt-2 text-sm">
-          <span v-if="currentFilter === 'all'"> Get started by creating your first task. </span>
-          <span v-else> No {{ currentFilter }} tasks match your current filter. </span>
+        <h3 class="mb-2 text-lg font-medium text-gray-900">No tasks found</h3>
+        <p class="text-gray-600">
+          <span v-if="currentFilter === 'all'">
+            Try adjusting your filters or create a new task.
+          </span>
+          <span v-else> Try adjusting your filters or create a new task. </span>
         </p>
-
-        <div class="mt-6">
-          <button
-            v-if="currentFilter !== 'all'"
-            type="button"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            @click="handleResetFilters"
-          >
-            Show all tasks
-          </button>
-        </div>
       </div>
 
       <!-- Pagination -->
-      <div v-if="hasResults && lastPage > 1" class="mt-8">
+      <div v-if="hasResults && lastPage > 1" class="mt-12">
         <nav
-          class="border-border flex items-center justify-between border-t px-4 sm:px-0"
+          class="flex items-center justify-between border-t px-4 sm:px-0"
           aria-label="Pagination"
         >
           <!-- Mobile Pagination -->

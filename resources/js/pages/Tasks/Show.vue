@@ -83,10 +83,10 @@
             <!-- Actions -->
             <div class="border-border flex items-center justify-between border-t pt-6">
               <Link
-                :href="route('dashboard')"
+                :href="route('tasks.index')"
                 class="inline-flex items-center rounded-md border border-transparent bg-gray-300 px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 uppercase transition duration-150 ease-in-out hover:bg-gray-400 focus:bg-gray-400 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none active:bg-gray-500"
               >
-                ← Back to Dashboard
+                ← Back to the list
               </Link>
 
               <div class="flex space-x-3">
