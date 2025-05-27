@@ -83,11 +83,11 @@ const getButtonClasses = (filterValue: TaskStatus) => {
 
   return cn(
     'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-200',
-    'border border-gray-200 dark:border-gray-700',
-    'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-900',
+    'border-border border',
+    'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
     isActive
-      ? 'border-blue-600 bg-blue-600 text-white shadow-sm hover:bg-blue-700'
-      : 'bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:bg-gray-700'
+      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
+      : 'bg-background text-foreground hover:border-border/80 hover:bg-muted'
   );
 };
 
@@ -109,7 +109,7 @@ const getFilterAriaLabel = (option: (typeof filterOptions)[0]) => {
 <template>
   <div :class="cn('flex flex-col gap-3 sm:flex-row', props.class)">
     <!-- Filter Label -->
-    <div class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div class="text-muted-foreground flex items-center gap-2 text-sm font-medium">
       <Filter class="h-4 w-4" />
       <span>Filter by status:</span>
     </div>
@@ -137,24 +137,3 @@ const getFilterAriaLabel = (option: (typeof filterOptions)[0]) => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Ensure proper focus visibility */
-button:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Screen reader only class */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-</style>

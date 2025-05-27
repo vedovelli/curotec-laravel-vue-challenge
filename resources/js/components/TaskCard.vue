@@ -19,17 +19,14 @@ const statusBadgeClasses = computed(() => {
     'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors';
 
   if (props.task.status === 'completed') {
-    return cn(baseClasses, 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400');
+    return cn(baseClasses, 'bg-green-100 text-green-800');
   }
 
   if (props.task.is_overdue) {
-    return cn(baseClasses, 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400');
+    return cn(baseClasses, 'bg-destructive/10 text-destructive');
   }
 
-  return cn(
-    baseClasses,
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-  );
+  return cn(baseClasses, 'bg-yellow-100 text-yellow-800');
 });
 
 const statusIcon = computed(() => {
@@ -50,7 +47,7 @@ const isTaskOverdue = computed(() => {
 
 const cardClasses = computed(() => {
   const baseClasses =
-    'group relative block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900';
+    'group relative block bg-background border border-border rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
   if (props.task.status === 'completed') {
     return cn(baseClasses, 'opacity-75 hover:opacity-100');
@@ -70,7 +67,7 @@ const cardClasses = computed(() => {
     <div class="mb-3 flex items-start justify-between gap-3">
       <div class="min-w-0 flex-1">
         <h3
-          class="line-clamp-2 text-base font-semibold text-gray-900 transition-colors group-hover:text-blue-600 sm:text-lg dark:text-gray-100 dark:group-hover:text-blue-400"
+          class="text-foreground group-hover:text-primary line-clamp-2 text-base font-semibold transition-colors sm:text-lg"
         >
           {{ task.title }}
         </h3>
@@ -85,14 +82,14 @@ const cardClasses = computed(() => {
 
     <!-- Task Description -->
     <div v-if="task.description" class="mb-4">
-      <p class="line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
+      <p class="text-muted-foreground line-clamp-3 text-sm">
         {{ task.description }}
       </p>
     </div>
 
     <!-- Task Footer -->
     <div
-      class="flex flex-col gap-2 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between dark:text-gray-400"
+      class="text-muted-foreground flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between"
     >
       <!-- Due Date -->
       <div v-if="task.due_date" class="flex items-center gap-1.5">
@@ -100,12 +97,7 @@ const cardClasses = computed(() => {
         <span>{{ dueDateText }}</span>
         <span
           v-if="relativeTimeText"
-          :class="
-            cn(
-              'font-medium',
-              isTaskOverdue ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
-            )
-          "
+          :class="cn('font-medium', isTaskOverdue ? 'text-destructive' : 'text-primary')"
         >
           ({{ relativeTimeText }})
         </span>
@@ -120,7 +112,7 @@ const cardClasses = computed(() => {
 
     <!-- Hover Indicator -->
     <div
-      class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors group-hover:border-blue-200 dark:group-hover:border-blue-800"
+      class="group-hover:border-primary/20 pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
     />
   </Link>
 </template>

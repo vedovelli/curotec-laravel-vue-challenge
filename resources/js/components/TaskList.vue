@@ -81,23 +81,17 @@ const handleResetFilters = () => {
 // Pagination link classes
 const getPaginationLinkClasses = (link: PaginationLink) => {
   const baseClasses =
-    'relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+    'relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors duration-200 focus:z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
   if (!link.url) {
-    return cn(
-      baseClasses,
-      'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-    );
+    return cn(baseClasses, 'bg-muted text-muted-foreground cursor-not-allowed');
   }
 
   if (link.active) {
-    return cn(baseClasses, 'z-10 bg-blue-600 text-white hover:bg-blue-700');
+    return cn(baseClasses, 'bg-primary text-primary-foreground hover:bg-primary/90 z-10');
   }
 
-  return cn(
-    baseClasses,
-    'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-  );
+  return cn(baseClasses, 'border-border bg-background text-foreground hover:bg-muted border');
 };
 
 // Task grid classes
@@ -119,7 +113,7 @@ const taskGridClasses = computed(() => {
 
     <!-- Loading State -->
     <div v-if="isLoading" class="space-y-4" aria-live="polite" aria-busy="true">
-      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div class="text-muted-foreground flex items-center gap-2 text-sm">
         <Loader2 class="h-4 w-4 animate-spin" />
         <span>Loading tasks...</span>
       </div>
@@ -142,7 +136,7 @@ const taskGridClasses = computed(() => {
     <div v-else>
       <!-- Results Summary -->
       <div class="mb-4 flex items-center justify-between">
-        <div class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">
+        <div class="text-muted-foreground text-sm" aria-live="polite">
           {{ filterStatusText }}
           <span v-if="hasResults && showingFrom && showingTo">
             ({{ showingFrom }}-{{ showingTo }} of {{ totalTasks }})
@@ -161,15 +155,13 @@ const taskGridClasses = computed(() => {
 
       <!-- Empty State -->
       <div v-else class="py-12 text-center">
-        <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800"
-        >
-          <AlertCircle class="h-6 w-6 text-gray-400" />
+        <div class="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+          <AlertCircle class="text-muted-foreground h-6 w-6" />
         </div>
 
-        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">No tasks found</h3>
+        <h3 class="text-foreground mt-4 text-lg font-medium">No tasks found</h3>
 
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-muted-foreground mt-2 text-sm">
           <span v-if="currentFilter === 'all'"> Get started by creating your first task. </span>
           <span v-else> No {{ currentFilter }} tasks match your current filter. </span>
         </p>
@@ -178,7 +170,7 @@ const taskGridClasses = computed(() => {
           <button
             v-if="currentFilter !== 'all'"
             type="button"
-            class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             @click="handleResetFilters"
           >
             Show all tasks
@@ -189,7 +181,7 @@ const taskGridClasses = computed(() => {
       <!-- Pagination -->
       <div v-if="hasResults && lastPage > 1" class="mt-8">
         <nav
-          class="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0 dark:border-gray-700"
+          class="border-border flex items-center justify-between border-t px-4 sm:px-0"
           aria-label="Pagination"
         >
           <!-- Mobile Pagination -->
@@ -207,7 +199,7 @@ const taskGridClasses = computed(() => {
           <!-- Desktop Pagination -->
           <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-gray-700 dark:text-gray-300">
+              <p class="text-foreground text-sm">
                 Showing
                 <span class="font-medium">{{ showingFrom }}</span>
                 to
