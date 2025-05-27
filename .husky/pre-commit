@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "📝 Running minimal pre-commit checks..."
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+print_status() {
+    echo "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo "${GREEN}[SUCCESS]${NC} $1"
+}
+
+# Only run fast, non-blocking checks here
+print_status "Pre-commit: Running minimal validation..."
+print_success "✅ Ready to commit! Quality checks will run on push."

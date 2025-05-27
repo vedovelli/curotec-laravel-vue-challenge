@@ -299,9 +299,42 @@ public function transform(Task $resource): TaskResource
 }
 ```
 
+## Automated Quality Checks with Husky
+
+This project uses [Husky git hooks](https://typicode.github.io/husky/) to automatically enforce quality standards. See [`HUSKY_SETUP.md`](./HUSKY_SETUP.md) for complete documentation.
+
+### Automatic Checks
+
+**Pre-commit hooks** run minimal checks for fast commits:
+
+- Minimal validation only
+
+**Pre-push hooks** run comprehensive quality validation:
+
+- PHPStan static analysis (`composer quality`)
+- PHP tests (`php artisan test`)
+- ESLint check (`npm run lint:check`)
+- Prettier formatting check (`npm run format:check`)
+- Frontend build (`npm run build`)
+- Console.log detection (warns but doesn't block)
+
+### Manual Quality Scripts
+
+```bash
+# Run all quality checks
+npm run quality:all
+
+# Run specific checks
+npm run quality:backend    # PHPStan + tests
+npm run quality:frontend   # ESLint + Prettier + build
+
+# Auto-fix issues
+npm run fix:frontend       # ESLint + Prettier auto-fix
+```
+
 ## Validation Checklist
 
-Before committing code, ensure:
+The following checks are **automatically enforced** by git hooks, but can also be run manually:
 
 - [ ] All tests pass (`php artisan test`)
 - [ ] PHPStan analysis passes (`composer quality`)
