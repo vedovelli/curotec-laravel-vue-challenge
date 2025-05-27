@@ -13,7 +13,7 @@ use Inertia\Response;
 
 /**
  * Dashboard Controller
- * 
+ *
  * Handles the main dashboard view that displays task overview,
  * statistics, and paginated task list for the Inertia.js application.
  */
@@ -30,16 +30,15 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request): Response
     {
-        // Get paginated tasks with latest first
-        $tasks = $this->task->latest()->paginate(10);
-        
-        // Get task statistics
+        $tasks = $this->task->pending()->get()->filter(
+            fn ($task) => $task->days_until_due < 1
+        )->take(5);
+
         $stats = $this->getTaskStatsAction->execute();
 
         return Inertia::render('Dashboard', [
-            'tasks' => TaskResource::collection($tasks),
+            'tasks' => $tasks,
             'stats' => $stats,
-            'pagination' => $tasks,
         ]);
     }
-} 
+}

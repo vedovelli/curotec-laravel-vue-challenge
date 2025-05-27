@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 /**
  * Task Model
- * 
+ *
  * @property int $id
  * @property string $title
  * @property string|null $description
@@ -20,7 +20,7 @@ use Carbon\Carbon;
  * @property Carbon|null $due_date
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * 
+ *
  * // Computed properties (accessors)
  * @property-read string $status_text
  * @property-read bool $is_overdue
@@ -31,6 +31,10 @@ final class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
+
+    protected $appends = [
+        'days_until_due',
+    ];
 
     // Status constants for validation and consistency
     public const STATUS_PENDING = 'pending';
@@ -108,7 +112,7 @@ final class Task extends Model
 
     /**
      * Scope a query to only include tasks due today.
-     * 
+     *
      * Note: Ready for future dashboard features (e.g., "Due Today" widget)
      *
      * @param Builder<Task> $query
@@ -121,7 +125,7 @@ final class Task extends Model
 
     /**
      * Scope a query to only include tasks due within the next X days.
-     * 
+     *
      * Note: Ready for future dashboard features (e.g., "Due This Week" widget)
      *
      * @param Builder<Task> $query
@@ -176,8 +180,8 @@ final class Task extends Model
      */
     public function isOverdue(): bool
     {
-        return $this->isPending() 
-               && $this->due_date !== null 
+        return $this->isPending()
+               && $this->due_date !== null
                && $this->due_date->isPast();
     }
 
