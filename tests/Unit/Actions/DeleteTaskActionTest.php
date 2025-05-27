@@ -41,6 +41,43 @@ it('throws exception for non-existent task', function (): void {
         ->toThrow(ModelNotFoundException::class);
 });
 
+it('extends BaseAction class', function (): void {
+    // Assert
+    $reflection = new ReflectionClass(DeleteTaskAction::class);
+    
+    expect($reflection->getParentClass()->getName())->toBe('App\Actions\BaseAction');
+});
+
+it('validates input correctly', function (): void {
+    // Test null input validation
+    expect(fn() => $this->action->handle(null))
+        ->toThrow(\InvalidArgumentException::class, 'Task ID cannot be null');
+});
+
+it('works with execute method for logging', function (): void {
+    // Arrange
+    $task = Task::factory()->create(['title' => 'Execute Method Task']);
+
+    // Act
+    $result = $this->action->execute($task->id);
+
+    // Assert
+    expect($result)->toBeTrue();
+    
+    $this->assertDatabaseMissing('tasks', [
+        'id' => $task->id,
+    ]);
+});
+
+it('accepts task model in constructor', function (): void {
+    // Arrange & Act
+    $taskModel = new Task;
+    $action = new DeleteTaskAction($taskModel);
+
+    // Assert
+    expect($action)->toBeInstanceOf(DeleteTaskAction::class);
+});
+
 it('can be resolved from service container with dependency injection', function (): void {
     // Arrange
     $task = Task::factory()->create();

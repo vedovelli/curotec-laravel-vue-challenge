@@ -92,6 +92,38 @@ it('calculates completion percentage correctly with decimal precision', function
         ->and($stats['completion_percentage'])->toBe(33.33);
 });
 
+it('extends BaseAction class', function (): void {
+    // Assert
+    $reflection = new ReflectionClass(GetTaskStatsAction::class);
+    
+    expect($reflection->getParentClass()->getName())->toBe('App\Actions\BaseAction');
+});
+
+it('works with execute method for logging', function (): void {
+    // Arrange
+    Task::factory()->count(2)->create(['status' => 'completed']);
+    Task::factory()->count(3)->create(['status' => 'pending']);
+
+    // Act
+    $stats = $this->action->execute();
+
+    // Assert
+    expect($stats)->toHaveKey('total_tasks')
+        ->and($stats['total_tasks'])->toBe(5)
+        ->and($stats['completed_tasks'])->toBe(2)
+        ->and($stats['pending_tasks'])->toBe(3)
+        ->and($stats['completion_percentage'])->toBe(40.0);
+});
+
+it('accepts task model in constructor', function (): void {
+    // Arrange & Act
+    $taskModel = new Task;
+    $action = new GetTaskStatsAction($taskModel);
+
+    // Assert
+    expect($action)->toBeInstanceOf(GetTaskStatsAction::class);
+});
+
 it('can be resolved from service container with dependency injection', function (): void {
     // Arrange
     Task::factory()->count(3)->create(['status' => 'completed']);

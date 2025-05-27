@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function (): void {
     $this->user = User::factory()->create();
@@ -181,4 +182,35 @@ it('requires authentication to create task', function (): void {
     $response->assertRedirect(route('login'));
     
     expect(Task::where('title', 'Test Task')->exists())->toBeFalse();
+});
+
+it('uses BaseAction execute method with logging in debug mode', function (): void {
+    // Arrange
+    config(['app.debug' => true]);
+    Log::spy();
+    
+    $taskData = [
+        'title' => 'BaseAction Test Task',
+        'status' => 'pending',
+    ];
+
+    // Act
+    $response = $this->actingAs($this->user)
+        ->post(route('tasks.store'), $taskData);
+
+    // Assert
+    $task = Task::where('title', 'BaseAction Test Task')->first();
+    expect($task)->not->toBeNull();
+    
+    $response->assertRedirect(route('tasks.show', $task))
+        ->assertSessionHas('success', 'Task created successfully!');
+    
+    // Verify BaseAction logging was called
+    Log::shouldHaveReceived('debug')
+        ->with('Action started: CreateTaskAction', \Mockery::type('array'))
+        ->once();
+    
+    Log::shouldHaveReceived('debug')
+        ->with('Action completed successfully: CreateTaskAction', \Mockery::type('array'))
+        ->once();
 }); 

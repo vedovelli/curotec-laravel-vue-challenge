@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function (): void {
     $this->user = User::factory()->create();
@@ -73,4 +74,30 @@ it('removes task from database completely', function (): void {
     expect(Task::find($taskId))->toBeNull();
     expect(Task::where('title', $taskTitle)->exists())->toBeFalse();
     // Verify task is completely removed (hard delete, not soft delete)
+});
+
+it('uses BaseAction execute method with logging in debug mode', function (): void {
+    // Arrange
+    config(['app.debug' => true]);
+    Log::spy();
+    $taskId = $this->task->id;
+
+    // Act
+    $response = $this->actingAs($this->user)
+        ->delete(route('tasks.destroy', $this->task));
+
+    // Assert
+    expect(Task::find($taskId))->toBeNull();
+    
+    $response->assertRedirect(route('dashboard'))
+        ->assertSessionHas('success', 'Task deleted successfully.');
+    
+    // Verify BaseAction logging was called
+    Log::shouldHaveReceived('debug')
+        ->with('Action started: DeleteTaskAction', \Mockery::type('array'))
+        ->once();
+    
+    Log::shouldHaveReceived('debug')
+        ->with('Action completed successfully: DeleteTaskAction', \Mockery::type('array'))
+        ->once();
 }); 

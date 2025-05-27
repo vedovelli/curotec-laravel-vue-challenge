@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Task;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function (): void {
     $this->user = User::factory()->create();
@@ -84,8 +85,6 @@ test('dashboard includes task resource fields', function (): void {
         );
 });
 
-
-
 test('dashboard paginates tasks correctly', function (): void {
     // Arrange
     $this->actingAs($this->user);
@@ -119,4 +118,33 @@ test('dashboard shows tasks in latest first order', function (): void {
             ->where('tasks.data.0.id', $newTask->id)
             ->where('tasks.data.1.id', $oldTask->id)
         );
+});
+
+test('dashboard uses BaseAction execute method with logging in debug mode', function (): void {
+    // Arrange
+    config(['app.debug' => true]);
+    Log::spy();
+    $this->actingAs($this->user);
+    Task::factory()->count(3)->create();
+
+    // Act
+    $response = $this->get('/dashboard');
+
+    // Assert
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Dashboard')
+            ->has('tasks')
+            ->has('stats')
+            ->has('pagination')
+        );
+    
+    // Verify BaseAction logging was called for GetTaskStatsAction
+    Log::shouldHaveReceived('debug')
+        ->with('Action started: GetTaskStatsAction', \Mockery::type('array'))
+        ->once();
+    
+    Log::shouldHaveReceived('debug')
+        ->with('Action completed successfully: GetTaskStatsAction', \Mockery::type('array'))
+        ->once();
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function (): void {
     $this->user = User::factory()->create();
@@ -218,4 +219,36 @@ it('returns 404 for non-existent task', function (): void {
     $this->actingAs($this->user)
         ->put(route('tasks.update', 999), $updateData)
         ->assertNotFound();
+});
+
+it('uses BaseAction execute method with logging in debug mode', function (): void {
+    // Arrange
+    config(['app.debug' => true]);
+    Log::spy();
+    
+    $updateData = [
+        'title' => 'BaseAction Updated Task',
+        'status' => 'completed',
+    ];
+
+    // Act
+    $response = $this->actingAs($this->user)
+        ->put(route('tasks.update', $this->task), $updateData);
+
+    // Assert
+    $this->task->refresh();
+    expect($this->task->title)->toBe('BaseAction Updated Task')
+        ->and($this->task->status)->toBe('completed');
+    
+    $response->assertRedirect(route('tasks.show', $this->task))
+        ->assertSessionHas('success', 'Task updated successfully.');
+    
+    // Verify BaseAction logging was called
+    Log::shouldHaveReceived('debug')
+        ->with('Action started: UpdateTaskAction', \Mockery::type('array'))
+        ->once();
+    
+    Log::shouldHaveReceived('debug')
+        ->with('Action completed successfully: UpdateTaskAction', \Mockery::type('array'))
+        ->once();
 }); 
